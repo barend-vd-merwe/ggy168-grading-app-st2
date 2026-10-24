@@ -197,19 +197,18 @@ with title_col2:
     st.title("GGY 168 — Introduction to Physical Geography")
     st.header("Semester Test 2")
 
-
-st.markdown("""
-### Instructions
-1. Enter your name in the provided space.
-2. Load the student submission.
-3. If there is an error during loading, refresh your browser window and try again.
-4. If it still doesn't work, send me an email with the student's details and move on to the next submission.
-5. Verify that the name on the submission matches the name of the file.
-6. Transfer the answers on the submission to the spaces provided.
-7. **DON'T** use commas for decimal marks. Please use a full-stop.
-9. When you are done, press the grade button.
-10. Download the graded submission and store it in a separate folder. **DON'T** change the filename.
-""")
+with st.expander("Instructions", expanded = False):
+    st.markdown("""
+    1. Enter your name in the provided space.
+    2. Load the student submission.
+    3. If there is an error during loading, refresh your browser window and try again.
+    4. If it still doesn't work, send me an email with the student's details and move on to the next submission.
+    5. Verify that the name on the submission matches the name of the file.
+    6. Transfer the answers on the submission to the spaces provided.
+    7. **DON'T** use commas for decimal marks. Please use a full-stop.
+    9. When you are done, press the grade button.
+    10. Download the graded submission and store it in a separate folder. **DON'T** change the filename.
+    """)
 
 if "script_index" not in st.session_state:
     st.session_state["script_index"] = 0
@@ -297,15 +296,13 @@ if uploaded_files and grader.strip():
                                     [ac.iloc[3,3], ac.iloc[3,4]],
                                     [ac.iloc[2,3], ac.iloc[2,4]]])
         
-        transformation_matrix = cv.getPerspectiveTransform(current_coords,
-                                                           target_coords)
-
-        # transform the image
-        warped_img = cv.warpPerspective(cv_img,
-                                        transformation_matrix,
-                                        (2480,3508),
-                                        borderMode=cv.BORDER_CONSTANT,
-                                        borderValue=(255, 255, 255))
+        affine_matrix, _ = cv.estimateAffine2D(current_coords, target_coords)
+        warped_img = cv.warpAffine(cv_img,
+                                   affine_matrix,
+                                   (2480, 3508),
+                                   flags=cv.INTER_LINEAR,
+                                   borderMode=cv.BORDER_CONSTANT,
+                                   borderValue=(255, 255, 255))
 
         # get zingg point
         shift = 8

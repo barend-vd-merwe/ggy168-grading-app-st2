@@ -1,0 +1,16 @@
+q1a:
+  ans: -156
+  fc: 0.0011
+  pc: 0.0022
+q1b:
+  ans: "Yes"
+q2a:
+  ans: "Clay"
+q2b:
+  ans: "Fine Silt"
+q3:
+  ans: -1.4087
+  fc: 0.001000157
+  pc: 0.002000313
+q4:
+  ans: "Disc"
