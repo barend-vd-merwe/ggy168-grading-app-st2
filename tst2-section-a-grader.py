@@ -13,18 +13,6 @@ from datetime import datetime
 # custom functions
 # ------------------------------------------------------------
 def submission_viewer(img_url, height=1000, max_zoom_ratio=4.0, key="osd_viewer"):
-    if isinstance(img, Image.Image):
-        pil_img = img
-    else:
-        pil_img = Image.open(img)
-
-    buffered = BytesIO()
-    if pil_img.mode in ("RGB", "P"):
-        pil_img = pil_img.convert("RGB")
-
-    pil_img.save(buffered, format="PNG", quality=95)
-    img_b64 = base64.b64encode(buffered.getvalue()).decode()
-
     # openseadragon
     html_osd = f"""
     <!DOCTYPE html>
@@ -86,67 +74,13 @@ def submission_viewer(img_url, height=1000, max_zoom_ratio=4.0, key="osd_viewer"
 # ------------------------------------------------------------
 def grade_submission():
     # memo q1
-    q1 = pd.read_csv("memo-q1.csv")
-    q1[q1["q"] == "a", "sub"] = st.session_state["q1a_sub"]
-    q1[q1["q"] == "b", "sub"] = st.session_state["q1b_weathering"]
-    q1[q1["q"] == "c", "sub"] = st.session_state["q1c_motivation"]
-    q1_units = st.session_state["q1a_unit"]
-
-    q1a_fc = q1[q1["q"] == "a", "sub"].between((q1["q"] == "a", "ans") - (q1["q"] == "a", "fc"),
-                                               (q1["q"] == "a", "ans") + (q1["q"] == "a", "fc"))
-    q1a_pc = q1[q1["q"] == "a", "sub"].between((q1["q"] == "a", "ans") - (q1["q"] == "a", "pc"),
-                                               (q1["q"] == "a", "ans") + (q1["q"] == "a", "pc"))
-    q1a_opt = [q1a_fc, q1a_pc]
-    q1a_grd = [1.0, 0.5]
-    q1[q1["q"] == "a", "grade"] += np.select(q1_opt, q1a_grd, default = 0.0)
-    q1[q1["q"] == "a", "grade"] += (q1_units == "fc").astype(float)
-
-    q1b = st.session_state["q1b_weathering"]
-    q1[q1["q"] == "b", "grade"] += (q1_units == "fc").astype(float)
-
-    q1c_fc = st.session_state["q1c_motivation"] == "fc"
-    q1c_pc = st.session_state["q1c_motivation"] == "pc"
-    q1c_nc = st.session_state["q1c_motivation"] == "nc"
-    q1c_opt = [q1c_fc, q1c_pc, q1c_nc]
-    q1c_grd = [4.0, 2.0, 0.0]
-
-    q1[q1["q"] == "c", "grade"] += np.select(q1c_opt, q1c_grd, default = 0.0)
-
-    st.session_state["q1a"] = q1[q1["q"] == "a", "grade"]
-    st.session_state["q1b"] = q1[q1["q"] == "b", "grade"]
-    st.session_state["q1c"] = q1[q1["q"] == "c", "grade"]
-    st.session_state["q1_total"] = q1["grade"].sum()
-
-    # ============================================================
-
-    q2 = {
-        "q"     : ["a", "b"],
-        "ans"   : ["Clay", "Fine Silt"],
-        "sub"   : [st.session_state["q2a"],
-                   st.session_state["q2b"]],
-        "grade" : [0.0,0.0]
-    }
-
-    q2 = pd.DataFrame(q2)
-    q2_fc = q2["sub"] == q2["ans"]
-    q2_nc = q2["sub"] != q2["ans"]
-    q2_opt = [q2_fc, q2_nc]
-    q2_grd = [0.5,0.0]
-    q2["grade"] += np.select(q2_opt, q2_grd, default = 0.0)
-
-    st.session_state["q2a"] = q2[q2["q"] == "a", "grade"]
-    st.session_state["q2b"] = q2[q2["q"] == "b", "grade"]
-    st.session_state["q2_total"] = q2["grade"].sum()
-
-    # ============================================================
-
-    q3 = pd.read_csv("memo-q3.csv")
-    q3["sub"].iloc[0] = st.session_state[""] 
-
+    pass
     
     
 def next_submission():
     st.session_state["script_index"] += 1
+    del st.session_state["graded_submission"]
+    # ==============================
     
     
     st.rerun()
@@ -195,7 +129,7 @@ with title_col1:
 
 with title_col2:
     st.title("GGY 168 — Introduction to Physical Geography")
-    st.header("Semester Test 2")
+    st.header("Semester Test 2 — Section A")
 
 with st.expander("Instructions", expanded = False):
     st.markdown("""
@@ -363,6 +297,8 @@ if uploaded_files and grader.strip():
 
             st.markdown("**Question 3**")
             st.text_input("Phi size", key = "q3_sub")
+
+            
 
         button_col1, button_col2, button_col3 = st.columns(3)
 

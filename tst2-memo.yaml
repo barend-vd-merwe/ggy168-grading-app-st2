@@ -14,3 +14,31 @@ q3:
   pc: 0.002000313
 q4:
   ans: "Disc"
+q5a:
+  ans: "No"
+q6a:
+  ans: "Sandy loam"
+q6b:
+  ans: "Moderately coarse"
+q6c:
+  ans: "Loamy soils"
+q7a:
+  ans: 553.35
+  fc: 2.187529
+  pc: 4.375058
+q7b:
+  ans: "A"
+q8a:
+  ans: 22.0
+  fc: 0.01064054
+  pc: 0.02128108
+q8b:
+  ans: 57.8378
+  fc: 0.01064054
+  pc: 0.02128108
+q8c:
+  ans: 35.8378
+  fc: 0.02138108
+  pc: 0.04276216
+q9a:
+  ans: 
