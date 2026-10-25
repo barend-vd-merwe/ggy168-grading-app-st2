@@ -2,6 +2,8 @@ library(torch)
 options(scipen = 999)
 
 rnd_error <- 1.0 * (10^(-4))
+ang_error <- 1.5
+dist_error <- 1.5
 
 ## gibbs free energy of reaction
 ## reagents
@@ -320,6 +322,192 @@ results <- data.frame(nodes = c("n1","n2","n3","n4","n5","n6","Y"),
 fc <- results$part %*% results$error
 pc <- 2*fc
 
+Y
+fc
+pc
+
+## calculate error for determining magnetic declination
+cur_year <- torch_tensor(2026.0, requires_grad = TRUE)
+ref_year <- torch_tensor(2016.0, requires_grad = TRUE)
+ref_md_deg <- torch_tensor(-19.0, requires_grad = TRUE)
+ref_md_min <- torch_tensor(-12.0, requires_grad = TRUE)
+delta_deg <- torch_tensor(0, requires_grad = TRUE)
+delta_min <- torch_tensor(-4, requires_grad = TRUE)
+c60 <- torch_tensor(60.0, requires_grad = TRUE)
+
+
+## convert reference md to dec
+n1 <- ref_md_min / c60
+n1$retain_grad()
+
+n2 <- n1 + ref_md_deg
+n2$retain_grad()
+
+## calculate total change
+n3 <- cur_year - ref_year
+n3$retain_grad()
+
+## convert change to dec
+n4 <- delta_min / c60
+n4$retain_grad()
+
+n5 <- delta_deg + n4
+n5$retain_grad()
+
+## calculate total change
+n6 <- n5 * n3
+n6$retain_grad()
+
+Y <- n2 + n6
+
+Y$backward()
+
+results <- data.frame(nodes = c("n1","n2","n3","n4","n5","n6","Y"),
+                      fwd = c(as.numeric(n1),
+                              as.numeric(n2),
+                              as.numeric(n3),
+                              as.numeric(n4),
+                              as.numeric(n5),
+                              as.numeric(n6),
+                              as.numeric(Y)),
+                      part = c(abs(as.numeric(n1$grad)),
+                               abs(as.numeric(n2$grad)),
+                               abs(as.numeric(n3$grad)),
+                               abs(as.numeric(n4$grad)),
+                               abs(as.numeric(n5$grad)),
+                               abs(as.numeric(n6$grad)),
+                               1.0),
+                      error = c(rnd_error,
+                                rnd_error,
+                                0.0,
+                                rnd_error,
+                                rnd_error,
+                                rnd_error,
+                                rnd_error))
+
+fc <- results$error %*% results$part
+pc <- 2 * fc
+Y
+fc
+pc
+
+## Calculate magnetic forward bearing
+cur_year <- torch_tensor(2026.0, requires_grad = TRUE)
+ref_year <- torch_tensor(2016.0, requires_grad = TRUE)
+ref_md_deg <- torch_tensor(-19.0, requires_grad = TRUE)
+ref_md_min <- torch_tensor(-12.0, requires_grad = TRUE)
+delta_deg <- torch_tensor(0, requires_grad = TRUE)
+delta_min <- torch_tensor(-4, requires_grad = TRUE)
+c60 <- torch_tensor(60.0, requires_grad = TRUE)
+tfb <- torch_tensor(100.0, requires_grad = TRUE)
+
+
+## convert reference md to dec
+n1 <- ref_md_min / c60
+n1$retain_grad()
+
+n2 <- n1 + ref_md_deg
+n2$retain_grad()
+
+## calculate total change
+n3 <- cur_year - ref_year
+n3$retain_grad()
+
+## convert change to dec
+n4 <- delta_min / c60
+n4$retain_grad()
+
+n5 <- delta_deg + n4
+n5$retain_grad()
+
+## calculate total change
+n6 <- n5 * n3
+n6$retain_grad()
+
+## calc new magnetic declination
+n7 <- n2 + n6
+n7$retain_grad()
+
+## calculate magnetic forward bearing
+Y <- tfb - n7
+
+Y$backward()
+
+results <- data.frame(nodes = c("tfb","n1","n2","n3",
+                                "n4","n5","n6","n7","Y"),
+                      fwd = c(as.numeric(tfb),
+                              as.numeric(n1),
+                              as.numeric(n2),
+                              as.numeric(n3),
+                              as.numeric(n4),
+                              as.numeric(n5),
+                              as.numeric(n6),
+                              as.numeric(n7),
+                              as.numeric(Y)),
+                      part = c(abs(as.numeric(tfb$grad)),
+                               abs(as.numeric(n1$grad)),
+                               abs(as.numeric(n2$grad)),
+                               abs(as.numeric(n3$grad)),
+                               abs(as.numeric(n4$grad)),
+                               abs(as.numeric(n5$grad)),
+                               abs(as.numeric(n6$grad)),
+                               abs(as.numeric(n7$grad)),
+                               1.0),
+                      error = c(ang_error,
+                                rnd_error,
+                                rnd_error,
+                                0.0,
+                                rnd_error,
+                                rnd_error,
+                                rnd_error,
+                                rnd_error,
+                                rnd_error))
+
+fc <- results$error %*% results$part
+pc <- 2 * fc
+Y
+fc
+pc
+
+## determine forward bearing given declination and
+## magnetic backward bearing
+md_deg <- torch_tensor(-8.0, requires_grad = TRUE)
+md_min <- torch_tensor(-45.0, requires_grad = TRUE)
+mbb <- torch_tensor(105.0, requires_grad = TRUE)
+c60 <- torch_tensor(60.0, requires_grad = TRUE)
+c180 <- torch_tensor(180.0, requires_grad = TRUE)
+
+## convert md to dec
+n1 <- md_min / c60
+n1$retain_grad()
+
+n2 <- md_deg + n1
+n2$retain_grad()
+
+## calc mfb
+n3 <- mbb + c180
+n3$retain_grad()
+
+Y <- n3 + n2
+
+Y$backward()
+
+results <- data.frame(nodes = c("n1","n2","n3","Y"),
+                      fwd = c(as.numeric(n1),
+                              as.numeric(n2),
+                              as.numeric(n3),
+                              as.numeric(Y)),
+                      part = c(abs(as.numeric(n1$grad)),
+                               abs(as.numeric(n2$grad)),
+                               abs(as.numeric(n3$grad)),
+                               1.0),
+                      error = c(rnd_error,
+                                rnd_error,
+                                rnd_error,
+                                rnd_error))
+
+fc <- results$error %*% results$part
+pc <- 2 * fc
 Y
 fc
 pc
