@@ -4,6 +4,7 @@ options(scipen = 999)
 rnd_error <- 1.0 * (10^(-4))
 ang_error <- 1.5
 dist_error <- 1.5
+cmp_error <- 2.0
 
 ## gibbs free energy of reaction
 ## reagents
@@ -502,6 +503,106 @@ results <- data.frame(nodes = c("n1","n2","n3","Y"),
                                abs(as.numeric(n3$grad)),
                                1.0),
                       error = c(rnd_error,
+                                rnd_error,
+                                rnd_error,
+                                rnd_error))
+
+fc <- results$error %*% results$part
+pc <- 2 * fc
+Y
+fc
+pc
+
+
+## Determine ground distance Bryn -> Kelt
+sb_dist <- torch_tensor(10000.0, requires_grad = TRUE)
+sb_length <- torch_tensor(34.0, requires_grad = TRUE)
+map_dist <- torch_tensor(55.0, requires_grad = TRUE)
+
+n1 <- sb_dist / sb_length
+n1$retain_grad()
+
+Y <- n1 * map_dist
+
+Y$backward()
+
+results <- data.frame(nodes = c("sb_length", "n1", "Y"),
+                      fwd = c(as.numeric(sb_length),
+                              as.numeric(n1),
+                              as.numeric(Y)),
+                      part = c(abs(as.numeric(sb_length$grad)),
+                               abs(as.numeric(n1$grad)),
+                               1.0),
+                      error = c(dist_error,
+                                rnd_error,
+                                rnd_error))
+
+fc <- results$error %*% results$part
+pc <- 2 * fc
+Y
+fc
+pc
+
+## length of irregular line
+sb_length <- torch_tensor(34.0, requires_grad = TRUE)
+sb_dist <- torch_tensor(10000.0, requires_grad = TRUE)
+arc_interval <- torch_tensor(4000.0, requires_grad = TRUE)
+remainder <- torch_tensor(8.0, requires_grad = TRUE)
+num_arcs <- torch_tensor(6.0, requires_grad = TRUE)
+
+## map scale factor (mm to m)
+n1 <- sb_length / sb_dist
+n1$retain_grad()
+
+## compass interval in mm
+n2 <- n1 * arc_interval
+n2$retain_grad()
+
+## ground dist scale factor (m to mm)
+
+n3 <- sb_dist / sb_length
+n3$retain_grad()
+
+## ground distance of arc
+n4 <- n2 * n3
+n4$retain_grad()
+
+## length based on arcs
+n5 <- num_arcs * n4
+n5$retain_grad()
+
+## ground distance of remainder
+n6 <- remainder * n3
+n6$retain_grad()
+
+## length of irregular line
+Y <- n5 + n6
+
+Y$backward()
+
+results <- data.frame(nodes = c("sb_length","n1","n2","n3",
+                                "n4","n5","n6","Y"),
+                      fwd = c(as.numeric(sb_length),
+                              as.numeric(n1),
+                              as.numeric(n2),
+                              as.numeric(n3),
+                              as.numeric(n4),
+                              as.numeric(n5),
+                              as.numeric(n6),
+                              as.numeric(Y)),
+                      part = c(abs(as.numeric(sb_length$grad)),
+                               abs(as.numeric(n1$grad)),
+                               abs(as.numeric(n2$grad)),
+                               abs(as.numeric(n3$grad)),
+                               abs(as.numeric(n4$grad)),
+                               abs(as.numeric(n5$grad)),
+                               abs(as.numeric(n6$grad)),
+                               1.0),
+                      error = c(dist_error,
+                                rnd_error,
+                                (rnd_error + cmp_error),
+                                rnd_error,
+                                rnd_error,
                                 rnd_error,
                                 rnd_error,
                                 rnd_error))

@@ -9,6 +9,7 @@ from io import BytesIO
 from streamlit_image_zoom import image_zoom
 import base64
 from datetime import datetime
+import yaml
 
 # custom functions
 # ------------------------------------------------------------
@@ -73,8 +74,231 @@ def submission_viewer(img_url, height=1000, max_zoom_ratio=4.0, key="osd_viewer"
 
 # ------------------------------------------------------------
 def grade_submission():
-    # memo q1
-    pass
+    with open ("tst2-memo.yaml", "r", encoding = "utf-8") as file:
+        memo = yaml.safe_load(file)
+
+    q1a_grade = 0.0
+    q1b_grade = 0.0
+    q1c_grade = 0.0
+
+    q1a_ans = memo["q1a"]["ans"]
+    q1a_fc = memo["q1a"]["fc"]
+    q1a_pc = memo["q1a"]["pc"]
+    q1a_sub = float(st.session_state["q1a_sub"])
+
+    q1a_range = [
+        (q1a_ans - q1a_fc, q1a_ans + q1a_fc, 1.0),
+        (q1a_ans - q1a_pc, q1a_ans + q1a_pc, 0.5)
+    ]
+
+    g1_grade += next((grade for lower, upper, grade in q1a_range if lower <= q1a_sub <= upper), 0)
+    
+    match q1_units:
+        case "fc":
+            q1a_grade += 1.0
+        case "pc":
+            q1a_grade += 0.5
+        case "nc":
+            q1a_grade += 0.0
+        
+    q1b_sub = st.session_state["q1b_weathering"]
+    q1b_ans = memo["q1b"]["ans"]
+
+    if q1b_sub == q1b_ans:
+        q1b_grade += 2.0
+
+    q1c_sub = st.session_state["q1c_motivation"]
+
+    match q1c_sub:
+        case "fc":
+            q1c_grade += 4.0
+        case "pc":
+            q1c_grade += 2.0
+        case "nc":
+            q1c_grade += 0.0
+
+    q1_grade = q1a_grade + q1b_grade + q1c_grade
+
+    # ============================================================
+    q2a_ans = memo["q2a"]["ans"]
+    q2b_ans = memo["q2b"]["ans"]
+
+    q2a_grade = 0.0
+    q2b_grade = 0.0
+
+    q2a_sub = st.session_state["q2a"]
+    q2b_sub = st.session_state["q2b"]
+
+    if q2a_sub == q2a_ans:
+        q2a_grade += 0.5
+
+    if q2b_sub == q2b_ans:
+        q2b_grade += 0.5
+
+    q2_grade = q2a_grade + q2b_grade
+
+    # ============================================================
+
+    q3_ans = memo["q3"]["ans"]
+    q3_fc = memo["q3"]["fc"]
+    q3_pc = memo["q3"]["pc"]
+
+    q3_sub = float(st.session_state["q3_sub"])
+
+    q3_grade = 0.0
+
+    q3_range = [
+        (q3_ans - q3_fc, q3_ans + q3_fc, 2.0),
+        (q3_ans - q3_pc, q3_ans + q3_pc, 1.0)
+    ]
+
+    q3_grade += next((grade for lower, upper, grade in q3_range if lower <= q3_sub <= upper), 0)
+
+    # ============================================================
+    q4_ans = memo["q4"]["ans"]
+    q4_sub = st.session_state["q4_shape"]
+    q4_work = st.session_state["q4_wrk"]
+    q4_grade = 0.0
+
+    if q4_sub == q4_ans:
+        q4_grade += 1.0
+    else:
+        q4_grade += 0.0
+
+    match q4_work:
+        case "fc":
+            q4_grade += 1.0
+        case "pc":
+            q4_grade += 0.5
+        case "nc":
+            q4_grade += 0.0
+
+    # ============================================================
+    q5a_ans = memo["q5a"]["ans"]
+    q5a_sub = st.session_state["q5a"]
+    q5a_grade = 0.0
+    q5b_grade = 0.0
+
+    if q5a_sub == q5a_ans:
+        q5a_grade += 1.0
+    else:
+        q5a_grade += 0.0
+
+    q5b_mot = st.session_state["q5b"]
+
+    match q5b_mot:
+        case "fc":
+            q5b_grade += 2.0
+        case "pc":
+            q5b_grade += 1.0
+        case "nc":
+            q5b_grade += 0.0
+
+    # ============================================================
+    q6a_ans = memo["q6a"]["ans"]
+    q6b_ans = memo["q6b"]["ans"]
+    q6c_ans = memo["q6c"]["ans"]
+    q6a_sub = st.session_state["q6a"]
+    q6b_sub = st.session_state["q6b"]
+    q6c_sub = st.session_state["q6c"]
+    q6a_grade = 0.0
+    q6b_grade = 0.0
+    q6c_grade = 0.0
+
+    if q6a_sub == q6a_ans:
+        q6a_grade += 3.0
+    else:
+        q6a_grade += 0.0
+
+    if q6b_sub == q6b_ans:
+        q6b_grade += 1.0
+    else:
+        q6b_grade += 0.0
+
+    if q6c_sub == q6c_ans:
+        q6c_grade += 1.0
+    else:
+        q6c_grade += 0.0
+
+    # ============================================================
+    q7a_ans = memo["q7a"]["ans"]
+    q7a_fc = memo["q7a"]["fc"]
+    q7a_pc = memo["q7a"]["pc"]
+    q7a_sub = float(st.session_state["q7a"])
+
+
+    q7a_grade = 0.0
+    q7a_range = [
+        (q7a_ans - q7a_fc, q7a_ans + q7a_fc, 1.0),
+        (q7a_ans - q7a_pc, q7a_ans + q7a_pc, 0.5)
+    ]
+    
+    q7a_grade += next((grade for lower, upper, grade in q7a_range if lower <= q7a_sub <= upper), 0)
+
+    q7b_ans = memo["q7b"]["ans"]
+    q7b_sub = st.session_state["q7b"]
+    q7b_grade = 0.0
+
+    if q7b_sub == q7a_ans:
+        q7b_grade += 1.0
+    else:
+        q7b_grade += 0.0
+
+    q7c_sub = st.session_state["q7c"]
+    q7c_grade = 0.0
+
+    match q7c_sub:
+        case "fc":
+            q7c_grade += 3.0
+        case "pc":
+            q7c_grade += 1.5
+        case "nc":
+            q7c_grade += 0.0
+
+    # ============================================================
+    q8a_ans = memo["q8a"]["ans"]
+    q8b_ans = memo["q8b"]["ans"]
+    q8c_ans = memo["q8c"]["ans"]
+
+    q8a_sub = st.session_state["q8a"]
+    q8b_sub = st.session_state["q8b"]
+    q8c_sub = st.session_state["q8c"]
+
+    q8a_fc = memo["q8a"]["fc"]
+    q8b_fc = memo["q8b"]["fc"]
+    q8c_fc = memo["q8c"]["fc"]
+
+    q8a_pc = memo["q8a"]["pc"]
+    q8b_pc = memo["q8b"]["pc"]
+    q8c_pc = memo["q8c"]["pc"]
+
+    q8a_grade = 0.0
+    q8b_grade = 0.0
+    q8c_grade = 0.0
+
+    q8a_range = [
+        (q8a_ans - q8a_fc, q8a_ans + q8a_fc, 1.0),
+        (q8a_ans - q8a_pc, q8a_ans + q8a_pc, 0.5)
+    ]
+
+    q8a_grade += next((grade for lower, upper, grade in q8a_range if lower <= q8a_sub <= upper), 0)
+
+    q8b_range = [
+        (q8b_ans - q8b_fc, q8b_ans + q8b_fc, 1.0),
+        (q8b_ans - q8b_pc, q8b_ans + q8b_pc, 0.5)
+    ]
+
+    q8b_grade += next((grade for lower, upper, grade in q8b_range if lower <= q8b_sub <= upper), 0)
+
+    q8a_grade += next((grade for lower, upper, grade in q8a_range if lower <= q8a_sub <= upper), 0)
+
+    q8c_range = [
+        (q8c_ans - q8c_fc, q8c_ans + q8c_fc, 1.0),
+        (q8c_ans - q8c_pc, q8c_ans + q8c_pc, 0.5)
+    ]
+
+    q8c_grade += next((grade for lower, upper, grade in q8c_range if lower <= q8c_sub <= upper), 0)
+    
     
     
 def next_submission():
@@ -172,23 +396,25 @@ if uploaded_files and grader.strip():
     surname, name, emplid = filename.split("_")
     st.session_state["student"] = f"{name} {surname} ({emplid})"
 
-    # read and display image
-    img = Image.open(image)
-
     # store the submission in memory as cv2 object
     img_bytes = np.frombuffer(image.getvalue(), dtype=np.uint8)
     cv_img = cv.imdecode(img_bytes, cv.IMREAD_COLOR)
+    img_gray = cv.cvtColor(cv_img, cv.COLOR_BGR2GRAY)
 
     # prepare values for detector
     aruco_dictionary = cv.aruco.getPredefinedDictionary(cv.aruco.DICT_4X4_50)
     parameters = cv.aruco.DetectorParameters()
+    parameters.cornerRefinementMethod = cv.aruco.CORNER_REFINE_SUBPIX
+    parameters.cornerRefinementWinSize = 5
+    parameters.cornerRefinementMaxIterations = 100
+    parameters.cornerRefinementMinAccuracy = 0.01
     
     # instantiate detector
     detector = cv.aruco.ArucoDetector(aruco_dictionary, parameters)
 
     try:
         # use detector to detect aruco markers
-        corners, ids, _ = detector.detectMarkers(cv_img)
+        corners, ids, _ = detector.detectMarkers(img_gray)
 
         # get the coordinates of the center points of each aruco marker
         ids = ids.flatten().tolist()
@@ -196,48 +422,53 @@ if uploaded_files and grader.strip():
         aruco_0_index = ids.index(0)
         aruco_0_corners = corners[aruco_0_index]
         aruco_0_corners_rshp = aruco_0_corners.reshape((4,2))
-        topleft_x = int(np.mean(aruco_0_corners_rshp[:,0]))
-        topleft_y = int(np.mean(aruco_0_corners_rshp[:,1]))
-
+        
         aruco_1_index = ids.index(1)
         aruco_1_corners = corners[aruco_1_index]
         aruco_1_corners_rshp = aruco_1_corners.reshape((4,2))
-        topright_x = int(np.mean(aruco_1_corners_rshp[:,0]))
-        topright_y = int(np.mean(aruco_1_corners_rshp[:,1]))
 
         aruco_2_index = ids.index(2)
         aruco_2_corners = corners[aruco_2_index]
         aruco_2_corners_rshp = aruco_2_corners.reshape((4,2))
-        bottomleft_x = int(np.mean(aruco_2_corners_rshp[:,0]))
-        bottomleft_y = int(np.mean(aruco_2_corners_rshp[:,1]))
 
         aruco_3_index = ids.index(3)
         aruco_3_corners = corners[aruco_3_index]
         aruco_3_corners_rshp = aruco_3_corners.reshape((4,2))
-        bottomright_x = int(np.mean(aruco_3_corners_rshp[:,0]))
-        bottomright_y = int(np.mean(aruco_3_corners_rshp[:,1]))
 
-        # Prepare the image for warping
-        current_coords = np.float32([[topleft_x, topleft_y],
-                                     [topright_x, topright_y],
-                                     [bottomright_x, bottomright_y],
-                                     [bottomleft_x, bottomleft_y]])
+        aruco_markers = [aruco_0_corners_rshp,
+                         aruco_1_corners_rshp,
+                         aruco_2_corners_rshp,
+                         aruco_3_corners_rshp]
 
-        ac = pd.read_csv("tst2-aruco-markers.csv")
+        current_coords_list = []
+        for marker in aruco_markers:
+            for i in range(4):
+                x_coord = marker[i,0]
+                y_coord = marker[i,1]
+                current_coords_list.append([x_coord, y_coord])
+        current_coords = np.array(current_coords_list, dtype=np.float32)
                 
-        target_coords = np.float32([[ac.iloc[0,3], ac.iloc[0,4]],
-                                    [ac.iloc[1,3], ac.iloc[1,4]],
-                                    [ac.iloc[3,3], ac.iloc[3,4]],
-                                    [ac.iloc[2,3], ac.iloc[2,4]]])
-        
-        affine_matrix, _ = cv.estimateAffine2D(current_coords, target_coords)
-        warped_img = cv.warpAffine(cv_img,
-                                   affine_matrix,
-                                   (2480, 3508),
-                                   flags=cv.INTER_LINEAR,
-                                   borderMode=cv.BORDER_CONSTANT,
-                                   borderValue=(255, 255, 255))
+        # Set target coordinates
 
+        ac = pd.read_csv("aruco.csv")
+
+        target_coords_list = []
+
+        for i in range(len(ac)):
+            x_coord = ac.iloc[i,4]
+            y_coord = ac.iloc[i,5]
+            target_coords_list.append([x_coord, y_coord])
+            
+        target_coords = np.array(target_coords_list, dtype=np.float32)
+
+        # transform the image
+        homography_matrix, mask = cv.findHomography(current_coords, target_coords, cv.RANSAC, 5.0)
+        warped_img = cv.warpPerspective(cv_img,
+                                        homography_matrix,
+                                        (2480, 3508),
+                                        flags=cv.INTER_LINEAR,
+                                        borderMode=cv.BORDER_CONSTANT,
+                                        borderValue=(255, 255, 255))
         # get zingg point
         shift = 8
         factor = 1 << shift
@@ -274,13 +505,13 @@ if uploaded_files and grader.strip():
             - *Student Number*: **{emplid}**
             """)
 
-        with st.expander("Questions", expanded = False):
+        with st.expander("Questions 1 to 3", expanded = False):
             st.markdown("**Question 1**")
             q1_col1, q1_col2 = st.columns(2)
 
             with q1_col1:
                 st.text_input("Change in Gibbs Free Energy", key = "q1a_sub")
-                st.selectbox("Weathering Reaction", ("Yes", "Other"), index = None, placeholder = "Make a selection..", key = "q1b_weathering")
+                st.selectbox("Weathering Reaction", ("Yes", "No"), index = None, placeholder = "Make a selection..", key = "q1b_weathering")
 
             with q1_col2:
                 st.selectbox("Units", ("fc","pc","nc"), index = None, placeholder="Make a selection...", key = "q1a_unit")
@@ -297,6 +528,96 @@ if uploaded_files and grader.strip():
 
             st.markdown("**Question 3**")
             st.text_input("Phi size", key = "q3_sub")
+
+        with st.expander("Questions 4 to 8", expanded = False):
+            st.markdown("**Question 4**")
+            q4_col1, q4_col2 = st.columns(2)
+
+            with q4_col1:
+                st.selectbox("Clast shape",
+                             ("Disc", "Other"),
+                             index = None,
+                             placeholder = "Make selection...",
+                             key = "q4_shape")
+
+            with q4_col2:
+                st.selectbox("Work shown",
+                             ("fc","pc","nc"),
+                             index = None,
+                             placeholder = "Make a selection...",
+                             key = "q4_wrk")
+
+            st.markdown("**Question 5**")
+            q5_col1, q5_col2 = st.columns(2)
+
+            with q5_col1:
+                st.selectbox("Sorted?",
+                             ("Yes","No"),
+                             index = None,
+                             placeholder = "Make a selection...",
+                             key = "q5a")
+            with q5_col2:
+                st.selectbox("Motivation",
+                             ("fc","pc","nc"),
+                             index = None,
+                             placeholder = "Make a selection...",
+                             key = "q5b")
+
+            st.markdown("**Question 6**")
+            q6_col1, q6_col2, q6_col3 = st.columns(3)
+
+            with q6_col1:
+                st.selectbox("Soil texture class",
+                             ("Sandy Loam", "Other"),
+                             index = None,
+                             placeholder = "Make a selection...",
+                             key = "q6a")
+
+            with q6_col2:
+                st.selectbox("Texture",
+                             ("Moderately coarse", "Other"),
+                             index = None,
+                             placeholder = "Make a selection...",
+                             key = "q6b")
+
+            with q6_col3:
+                st.selectbox("Common Name",
+                             ("Loamy soils", "Other"),
+                             index = None,
+                             placeholder = "Make a selection...",
+                             key = "q6c")
+                
+            st.markdown("**Question 7**")
+            q7_col1, q7_col2, q7_col3 = st.columns(3)
+
+            with q7_col1:
+                st.text_input("Penetration Resistance", key = "q7a")
+
+            with q7_col2:
+                st.selectbox("Site",
+                             ("Site A", "Site B"),
+                             index = None,
+                             placeholder = "Make a selection...",
+                             key = "q7b")
+
+            with q7_col3:
+                st.selectbox("Motivation",
+                             ("fc", "pc", "nc"),
+                             index = None,
+                             placeholder = "Make a selection...",
+                             key = "q7c")
+
+            st.markdown("**Question 8**")
+            q8_col1, q8_col2, q8_col3 = st.columns(3)
+
+            with q8_col1:
+                st.text_input("Plastic limit", key = "q8a")
+
+            with q8_col2:
+                st.text_input("Liquid limit", key = "q8b")
+
+            with q8_col3:
+                st.text_input("Plasticity index", key = "q8c")
 
             
 
