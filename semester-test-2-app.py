@@ -10,6 +10,7 @@ from streamlit_image_zoom import image_zoom
 import base64
 from datetime import datetime
 import yaml
+from streamlit_gsheets import GSheetsConnection
 
 # custom functions
 # ------------------------------------------------------------
@@ -346,12 +347,13 @@ def grade_submission():
                                            st.session_state["q6_grade"],
                                            st.session_state["q7_grade"],
                                            st.session_state["q8_grade"]])
-    gc_file = "gradebook.csv"
-    gc = pd.read_csv(gc_file)
-    gc.loc[gc["Username"] == emplid,
-           "Semester test 2 Section A [Total Pts: 29 Score] |2953721"] = st.session_state["final_grade"]
-    gc.to_csv(gc_file, index = False)
-    
+
+    conn = st.connection("gsheets", type=GSheetsConnection)
+    gc = conn.read(ttl=0)
+    st.dataframe(gc)
+    column_name = "Semester test 2 Section A [Total Pts: 29 Score] |2953721"
+    gc.loc[gc["Username"] == emplid, column_name] = st.session_state["final_grade"]
+    conn.update(data=gc)
 
     cv.putText(warped_img, str(st.session_state["final_grade"]), (850,455), cv.FONT_HERSHEY_SIMPLEX, 3.0, (0,0,255), 1)
     cv.putText(warped_img, st.session_state["student"], (303,199), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
