@@ -490,133 +490,131 @@ with st.sidebar:
                                       accept_multiple_files = True,
                                       key = str(st.session_state["uploader_key"]))
     st.button("Clear", on_click = clear_files)
+tab1, tab2 = st.tabs(["Section A", "Section B"])
+with tab1:
+    if uploaded_files and grader.strip():
+        total_scripts = len(uploaded_files)
+        current_script = st.session_state["script_index"] + 1
+        progress = min(current_script / total_scripts, 1.0)
+        st.progress(progress)
 
-if uploaded_files and grader.strip():
-    total_scripts = len(uploaded_files)
-    current_script = st.session_state["script_index"] + 1
-    progress = min(current_script / total_scripts, 1.0)
-    st.progress(progress)
+        # extract student details from img filename
+        image = uploaded_files[st.session_state["script_index"]]
+        filename = image.name
+        filename = filename.replace(".png","")
+        surname, name, emplid = filename.split("_")
+        st.session_state["student"] = f"{name} {surname} ({emplid})"
 
-    # extract student details from img filename
-    image = uploaded_files[st.session_state["script_index"]]
-    filename = image.name
-    filename = filename.replace(".png","")
-    surname, name, emplid = filename.split("_")
-    st.session_state["student"] = f"{name} {surname} ({emplid})"
+        # store the submission in memory as cv2 object
+        img_bytes = np.frombuffer(image.getvalue(), dtype=np.uint8)
+        cv_img = cv.imdecode(img_bytes, cv.IMREAD_COLOR)
+        img_gray = cv.cvtColor(cv_img, cv.COLOR_BGR2GRAY)
 
-    # store the submission in memory as cv2 object
-    img_bytes = np.frombuffer(image.getvalue(), dtype=np.uint8)
-    cv_img = cv.imdecode(img_bytes, cv.IMREAD_COLOR)
-    img_gray = cv.cvtColor(cv_img, cv.COLOR_BGR2GRAY)
+        # prepare values for detector
+        aruco_dictionary = cv.aruco.getPredefinedDictionary(cv.aruco.DICT_4X4_50)
+        parameters = cv.aruco.DetectorParameters()
+        parameters.cornerRefinementMethod = cv.aruco.CORNER_REFINE_SUBPIX
+        parameters.cornerRefinementWinSize = 5
+        parameters.cornerRefinementMaxIterations = 100
+        parameters.cornerRefinementMinAccuracy = 0.01
 
-    # prepare values for detector
-    aruco_dictionary = cv.aruco.getPredefinedDictionary(cv.aruco.DICT_4X4_50)
-    parameters = cv.aruco.DetectorParameters()
-    parameters.cornerRefinementMethod = cv.aruco.CORNER_REFINE_SUBPIX
-    parameters.cornerRefinementWinSize = 5
-    parameters.cornerRefinementMaxIterations = 100
-    parameters.cornerRefinementMinAccuracy = 0.01
-    
-    # instantiate detector
-    detector = cv.aruco.ArucoDetector(aruco_dictionary, parameters)
+        # instantiate detector
+        detector = cv.aruco.ArucoDetector(aruco_dictionary, parameters)
 
-    try:
-        # use detector to detect aruco markers
-        corners, ids, _ = detector.detectMarkers(img_gray)
+        try:
+            # use detector to detect aruco markers
+            corners, ids, _ = detector.detectMarkers(img_gray)
 
-        # get the coordinates of the center points of each aruco marker
-        ids = ids.flatten().tolist()
+            # get the coordinates of the center points of each aruco marker
+            ids = ids.flatten().tolist()
 
-        aruco_0_index = ids.index(0)
-        aruco_0_corners = corners[aruco_0_index]
-        aruco_0_corners_rshp = aruco_0_corners.reshape((4,2))
-        
-        aruco_1_index = ids.index(1)
-        aruco_1_corners = corners[aruco_1_index]
-        aruco_1_corners_rshp = aruco_1_corners.reshape((4,2))
+            aruco_0_index = ids.index(0)
+            aruco_0_corners = corners[aruco_0_index]
+            aruco_0_corners_rshp = aruco_0_corners.reshape((4,2))
 
-        aruco_2_index = ids.index(2)
-        aruco_2_corners = corners[aruco_2_index]
-        aruco_2_corners_rshp = aruco_2_corners.reshape((4,2))
+            aruco_1_index = ids.index(1)
+            aruco_1_corners = corners[aruco_1_index]
+            aruco_1_corners_rshp = aruco_1_corners.reshape((4,2))
 
-        aruco_3_index = ids.index(3)
-        aruco_3_corners = corners[aruco_3_index]
-        aruco_3_corners_rshp = aruco_3_corners.reshape((4,2))
+            aruco_2_index = ids.index(2)
+            aruco_2_corners = corners[aruco_2_index]
+            aruco_2_corners_rshp = aruco_2_corners.reshape((4,2))
 
-        aruco_markers = [aruco_0_corners_rshp,
-                         aruco_1_corners_rshp,
-                         aruco_2_corners_rshp,
-                         aruco_3_corners_rshp]
+            aruco_3_index = ids.index(3)
+            aruco_3_corners = corners[aruco_3_index]
+            aruco_3_corners_rshp = aruco_3_corners.reshape((4,2))
 
-        current_coords_list = []
-        for marker in aruco_markers:
-            for i in range(4):
-                x_coord = marker[i,0]
-                y_coord = marker[i,1]
-                current_coords_list.append([x_coord, y_coord])
-        current_coords = np.array(current_coords_list, dtype=np.float32)
-                
-        # Set target coordinates
+            aruco_markers = [aruco_0_corners_rshp,
+                             aruco_1_corners_rshp,
+                             aruco_2_corners_rshp,
+                             aruco_3_corners_rshp]
 
-        ac = pd.read_csv("aruco.csv")
+            current_coords_list = []
+            for marker in aruco_markers:
+                for i in range(4):
+                    x_coord = marker[i,0]
+                    y_coord = marker[i,1]
+                    current_coords_list.append([x_coord, y_coord])
+            current_coords = np.array(current_coords_list, dtype=np.float32)
 
-        target_coords_list = []
+            # Set target coordinates
 
-        for i in range(len(ac)):
-            x_coord = ac.iloc[i,4]
-            y_coord = ac.iloc[i,5]
-            target_coords_list.append([x_coord, y_coord])
-            
-        target_coords = np.array(target_coords_list, dtype=np.float32)
+            ac = pd.read_csv("aruco.csv")
 
-        # transform the image
-        homography_matrix, mask = cv.findHomography(current_coords, target_coords, cv.RANSAC, 5.0)
-        warped_img = cv.warpPerspective(cv_img,
-                                        homography_matrix,
-                                        (2480, 3508),
-                                        flags=cv.INTER_LINEAR,
-                                        borderMode=cv.BORDER_CONSTANT,
-                                        borderValue=(255, 255, 255))
-        # get zingg point
-        shift = 8
-        factor = 1 << shift
-        zingg=pd.read_csv("zingg.csv")
-        tlx = int(round(zingg.iloc[0,3] * factor))
-        tly = int(round(zingg.iloc[0,4] * factor))
-        brx = int(round(zingg.iloc[1,3] * factor))
-        bry = int(round(zingg.iloc[1,4] * factor))
+            target_coords_list = []
 
-        cv.rectangle(warped_img, (tlx,tly), (brx,bry), (0,0,255), thickness = 2, shift = shift)
+            for i in range(len(ac)):
+                x_coord = ac.iloc[i,4]
+                y_coord = ac.iloc[i,5]
+                target_coords_list.append([x_coord, y_coord])
 
-        st.session_state["submission"] = warped_img
+            target_coords = np.array(target_coords_list, dtype=np.float32)
 
-        processed_img = cv.imencode(".png",warped_img)[1]
-        b64_str = base64.b64encode(processed_img).decode("utf-8")
-        img_url = f"data:image/png;base64,{b64_str}"
+            # transform the image
+            homography_matrix, mask = cv.findHomography(current_coords, target_coords, cv.RANSAC, 5.0)
+            warped_img = cv.warpPerspective(cv_img,
+                                            homography_matrix,
+                                            (2480, 3508),
+                                            flags=cv.INTER_LINEAR,
+                                            borderMode=cv.BORDER_CONSTANT,
+                                            borderValue=(255, 255, 255))
+            # get zingg point
+            shift = 8
+            factor = 1 << shift
+            zingg=pd.read_csv("zingg.csv")
+            tlx = int(round(zingg.iloc[0,3] * factor))
+            tly = int(round(zingg.iloc[0,4] * factor))
+            brx = int(round(zingg.iloc[1,3] * factor))
+            bry = int(round(zingg.iloc[1,4] * factor))
+
+            cv.rectangle(warped_img, (tlx,tly), (brx,bry), (0,0,255), thickness = 2, shift = shift)
+
+            st.session_state["submission"] = warped_img
+
+            processed_img = cv.imencode(".png",warped_img)[1]
+            b64_str = base64.b64encode(processed_img).decode("utf-8")
+            img_url = f"data:image/png;base64,{b64_str}"
 
 
-    except Exception as e:
-        st.error(f"Processing failed: {e}")
-        img_url = None
+        except Exception as e:
+            st.error(f"Processing failed: {e}")
+            img_url = None
 
-    # display submission and grading tools in two cols
-    col1, col2 = st.columns(2)
+        # display submission and grading tools in two cols
+        col1, col2 = st.columns(2)
 
-    with col1:    
-        submission_viewer(img_url)
+        with col1:    
+            submission_viewer(img_url)
 
-    with col2:
-        # display student details
-        with st.expander("Student Details", expanded = False):
-            st.markdown(f"""
-            - *Name*: **{name}**
-            - *Surname*: **{surname}**
-            - *Student Number*: **{emplid}**
-            """)
+        with col2:
+            # display student details
+            with st.expander("Student Details", expanded = False):
+                st.markdown(f"""
+                - *Name*: **{name}**
+                - *Surname*: **{surname}**
+                - *Student Number*: **{emplid}**
+                """)
 
-        tab1, tab2 = st.tabs(["Section A", "Section B"])
-
-        with tab1:
             with st.expander("Questions 1 to 3", expanded = False):
                 st.markdown("**Question 1**")
                 q1_col1, q1_col2 = st.columns(2)
@@ -754,7 +752,7 @@ if uploaded_files and grader.strip():
                                  index = None,
                                  placeholder = "Make a selection...",
                                  key = "q8b_unt")
-            
+
 
             button_col1, button_col2, button_col3 = st.columns(3)
 
@@ -788,4 +786,28 @@ if uploaded_files and grader.strip():
                 if st.session_state["script_index"] < len(uploaded_files) - 1:
                     with button_col3:
                         st.button("Next Submission", on_click = next_submission)
+        with tab2:
+            with st.expander("Question ", expanded = False):
+                st.markdown("**Question 9**")
+                q9_col1, q9_col2, q9_col3, q9_col4 = st.columns(4)
+
+                with q9_col1:
+                    st.text_input("Tfb", key = "q9a_val")
+
+                with q9_col2:
+                    st.selectbox("Units",
+                                 ("fc", "nc"),
+                                 index = None,
+                                 placeholder = "Make a selection...",
+                                 key = "q9a_unt")
+
+                with q9_col3:
+                    st.text_input("Tbb", key = "q9b_val")
+
+                with q9_col4:
+                    st.selectbox("Units",
+                                 ("fc", "nc"),
+                                 index = None,
+                                 placeholder = "Make a selection...",
+                                 key = "q9b_unt")
 
