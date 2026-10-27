@@ -4,3 +4,4 @@ pandas==3.0.5
 Pillow==12.3.0
 streamlit==1.64.0
 streamlit-image-zoom==0.0.4
+PyYAML==6.0.3
