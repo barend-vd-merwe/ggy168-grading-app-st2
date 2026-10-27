@@ -461,7 +461,7 @@ with title_col1:
 
 with title_col2:
     st.title("GGY 168 — Introduction to Physical Geography")
-    st.header("Semester Test 2 — Section A")
+    st.header("Semester Test 2")
 
 with st.expander("Instructions", expanded = False):
     st.markdown("""
