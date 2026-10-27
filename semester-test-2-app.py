@@ -614,143 +614,146 @@ if uploaded_files and grader.strip():
             - *Student Number*: **{emplid}**
             """)
 
-        with st.expander("Questions 1 to 3", expanded = False):
-            st.markdown("**Question 1**")
-            q1_col1, q1_col2 = st.columns(2)
+        tab1, tab2 = st.tabs(["Section A", "Section B"])
 
-            with q1_col1:
-                st.text_input("Change in Gibbs Free Energy", key = "q1a_sub")
-                st.selectbox("Weathering Reaction", ("Yes", "No"), index = None, placeholder = "Make a selection..", key = "q1b_weathering")
+        with tab1:
+            with st.expander("Questions 1 to 3", expanded = False):
+                st.markdown("**Question 1**")
+                q1_col1, q1_col2 = st.columns(2)
 
-            with q1_col2:
-                st.selectbox("Units", ("fc","pc","nc"), index = None, placeholder="Make a selection...", key = "q1a_unit")
-                st.selectbox("Motivation", ("fc","pc","nc"), index = None, placeholder = "Make a selection..", key = "q1c_motivation")
+                with q1_col1:
+                    st.text_input("Change in Gibbs Free Energy", key = "q1a_sub")
+                    st.selectbox("Weathering Reaction", ("Yes", "No"), index = None, placeholder = "Make a selection..", key = "q1b_weathering")
 
-            st.markdown("**Question 2**")
-            q2_col1, q2_col2 = st.columns(2)
+                with q1_col2:
+                    st.selectbox("Units", ("fc","pc","nc"), index = None, placeholder="Make a selection...", key = "q1a_unit")
+                    st.selectbox("Motivation", ("fc","pc","nc"), index = None, placeholder = "Make a selection..", key = "q1c_motivation")
 
-            with q2_col1:
-                st.selectbox("a) 0.002 mm", ("Clay", "Other"), index = None, placeholder = "Make a selection...", key = "q2a")
+                st.markdown("**Question 2**")
+                q2_col1, q2_col2 = st.columns(2)
 
-            with q2_col2:
-                st.selectbox("a) 0.01 mm", ("Fine Silt", "Other"), index = None, placeholder = "Make a selection...", key = "q2b")
+                with q2_col1:
+                    st.selectbox("a) 0.002 mm", ("Clay", "Other"), index = None, placeholder = "Make a selection...", key = "q2a")
 
-            st.markdown("**Question 3**")
-            st.text_input("Phi size", key = "q3_sub")
+                with q2_col2:
+                    st.selectbox("a) 0.01 mm", ("Fine Silt", "Other"), index = None, placeholder = "Make a selection...", key = "q2b")
 
-        with st.expander("Questions 4 to 8", expanded = False):
-            st.markdown("**Question 4**")
-            q4_col1, q4_col2 = st.columns(2)
+                st.markdown("**Question 3**")
+                st.text_input("Phi size", key = "q3_sub")
 
-            with q4_col1:
-                st.selectbox("Clast shape",
-                             ("Disc", "Other"),
-                             index = None,
-                             placeholder = "Make selection...",
-                             key = "q4_shape")
+            with st.expander("Questions 4 to 8", expanded = False):
+                st.markdown("**Question 4**")
+                q4_col1, q4_col2 = st.columns(2)
 
-            with q4_col2:
-                st.selectbox("Work shown",
-                             ("fc","pc","nc"),
-                             index = None,
-                             placeholder = "Make a selection...",
-                             key = "q4_wrk")
+                with q4_col1:
+                    st.selectbox("Clast shape",
+                                 ("Disc", "Other"),
+                                 index = None,
+                                 placeholder = "Make selection...",
+                                 key = "q4_shape")
 
-            st.markdown("**Question 5**")
-            q5_col1, q5_col2 = st.columns(2)
+                with q4_col2:
+                    st.selectbox("Work shown",
+                                 ("fc","pc","nc"),
+                                 index = None,
+                                 placeholder = "Make a selection...",
+                                 key = "q4_wrk")
 
-            with q5_col1:
-                st.selectbox("Sorted?",
-                             ("Yes","No"),
-                             index = None,
-                             placeholder = "Make a selection...",
-                             key = "q5a")
-            with q5_col2:
-                st.selectbox("Motivation",
-                             ("fc","pc","nc"),
-                             index = None,
-                             placeholder = "Make a selection...",
-                             key = "q5b")
+                st.markdown("**Question 5**")
+                q5_col1, q5_col2 = st.columns(2)
 
-            st.markdown("**Question 6**")
-            q6_col1, q6_col2, q6_col3 = st.columns(3)
+                with q5_col1:
+                    st.selectbox("Sorted?",
+                                 ("Yes","No"),
+                                 index = None,
+                                 placeholder = "Make a selection...",
+                                 key = "q5a")
+                with q5_col2:
+                    st.selectbox("Motivation",
+                                 ("fc","pc","nc"),
+                                 index = None,
+                                 placeholder = "Make a selection...",
+                                 key = "q5b")
 
-            with q6_col1:
-                st.selectbox("Soil texture class",
-                             ("Sandy Loam", "Other"),
-                             index = None,
-                             placeholder = "Make a selection...",
-                             key = "q6a")
+                st.markdown("**Question 6**")
+                q6_col1, q6_col2, q6_col3 = st.columns(3)
 
-            with q6_col2:
-                st.selectbox("Texture",
-                             ("Moderately coarse", "Other"),
-                             index = None,
-                             placeholder = "Make a selection...",
-                             key = "q6b")
+                with q6_col1:
+                    st.selectbox("Soil texture class",
+                                 ("Sandy Loam", "Other"),
+                                 index = None,
+                                 placeholder = "Make a selection...",
+                                 key = "q6a")
 
-            with q6_col3:
-                st.selectbox("Common Name",
-                             ("Loamy soils", "Other"),
-                             index = None,
-                             placeholder = "Make a selection...",
-                             key = "q6c")
-                
-            st.markdown("**Question 7**")
-            q7_col1, q7_col2, q7_col3, q7_col4 = st.columns(4)
+                with q6_col2:
+                    st.selectbox("Texture",
+                                 ("Moderately coarse", "Other"),
+                                 index = None,
+                                 placeholder = "Make a selection...",
+                                 key = "q6b")
 
-            with q7_col1:
-                st.text_input("Penetration Resistance", key = "q7a")
+                with q6_col3:
+                    st.selectbox("Common Name",
+                                 ("Loamy soils", "Other"),
+                                 index = None,
+                                 placeholder = "Make a selection...",
+                                 key = "q6c")
 
-            with q7_col2:
-                st.selectbox("Units",
-                             ("fc","nc"),
-                             index = None,
-                             placeholder = "Make a selection...",
-                             key = "q7a_unt")
-                
-            with q7_col3:
-                st.selectbox("Site",
-                             ("Site A", "Site B"),
-                             index = None,
-                             placeholder = "Make a selection...",
-                             key = "q7b")
+                st.markdown("**Question 7**")
+                q7_col1, q7_col2, q7_col3, q7_col4 = st.columns(4)
 
-            with q7_col4:
-                st.selectbox("Motivation",
-                             ("fc", "pc", "nc"),
-                             index = None,
-                             placeholder = "Make a selection...",
-                             key = "q7c")
+                with q7_col1:
+                    st.text_input("Penetration Resistance", key = "q7a")
 
-            st.markdown("**Question 8**")
-            q8_col1, q8_col2, q8_col3, q8_col4 = st.columns(4)
+                with q7_col2:
+                    st.selectbox("Units",
+                                 ("fc","nc"),
+                                 index = None,
+                                 placeholder = "Make a selection...",
+                                 key = "q7a_unt")
 
-            with q8_col1:
-                st.text_input("Plastic limit", key = "q8a")
-                st.text_input("Plasticity index", key = "q8c")
+                with q7_col3:
+                    st.selectbox("Site",
+                                 ("Site A", "Site B"),
+                                 index = None,
+                                 placeholder = "Make a selection...",
+                                 key = "q7b")
 
-            with q8_col2:
-                st.selectbox("Units",
-                             ("fc","nc"),
-                             index = None,
-                             placeholder = "Make a selection...",
-                             key = "q8a_unt")
-                st.selectbox("Units",
-                             ("fc","nc"),
-                             index = None,
-                             placeholder = "Make a selection...",
-                             key = "q8c_unt")
+                with q7_col4:
+                    st.selectbox("Motivation",
+                                 ("fc", "pc", "nc"),
+                                 index = None,
+                                 placeholder = "Make a selection...",
+                                 key = "q7c")
 
-            with q8_col3:
-                st.text_input("Liquid limit", key = "q8b")
+                st.markdown("**Question 8**")
+                q8_col1, q8_col2, q8_col3, q8_col4 = st.columns(4)
 
-            with q8_col4:
-                st.selectbox("Units",
-                             ("fc","nc"),
-                             index = None,
-                             placeholder = "Make a selection...",
-                             key = "q8b_unt")
+                with q8_col1:
+                    st.text_input("Plastic limit", key = "q8a")
+                    st.text_input("Plasticity index", key = "q8c")
+
+                with q8_col2:
+                    st.selectbox("Units",
+                                 ("fc","nc"),
+                                 index = None,
+                                 placeholder = "Make a selection...",
+                                 key = "q8a_unt")
+                    st.selectbox("Units",
+                                 ("fc","nc"),
+                                 index = None,
+                                 placeholder = "Make a selection...",
+                                 key = "q8c_unt")
+
+                with q8_col3:
+                    st.text_input("Liquid limit", key = "q8b")
+
+                with q8_col4:
+                    st.selectbox("Units",
+                                 ("fc","nc"),
+                                 index = None,
+                                 placeholder = "Make a selection...",
+                                 key = "q8b_unt")
             
 
         button_col1, button_col2, button_col3 = st.columns(3)
