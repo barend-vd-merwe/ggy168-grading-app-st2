@@ -91,16 +91,18 @@ def grade_submission():
         (q1a_ans - q1a_pc, q1a_ans + q1a_pc, 0.5)
     ]
 
-    g1_grade += next((grade for lower, upper, grade in q1a_range if lower <= q1a_sub <= upper), 0)
+    q1a_grade += next((grade for lower, upper, grade in q1a_range if lower <= q1a_sub <= upper), 0)
+
+    q1_unit_sub = st.session_state["q1a_unit"]
     
-    match q1_units:
+    match q1_unit_sub:
         case "fc":
             q1a_grade += 1.0
         case "pc":
             q1a_grade += 0.5
         case "nc":
             q1a_grade += 0.0
-        
+            
     q1b_sub = st.session_state["q1b_weathering"]
     q1b_ans = memo["q1b"]["ans"]
 
@@ -117,7 +119,7 @@ def grade_submission():
         case "nc":
             q1c_grade += 0.0
 
-    q1_grade = q1a_grade + q1b_grade + q1c_grade
+    st.session_state["q1_grade"] = q1a_grade + q1b_grade + q1c_grade
 
     # ============================================================
     q2a_ans = memo["q2a"]["ans"]
@@ -135,7 +137,7 @@ def grade_submission():
     if q2b_sub == q2b_ans:
         q2b_grade += 0.5
 
-    q2_grade = q2a_grade + q2b_grade
+    st.session_state["q2_grade"] = q2a_grade + q2b_grade
 
     # ============================================================
 
@@ -153,7 +155,7 @@ def grade_submission():
     ]
 
     q3_grade += next((grade for lower, upper, grade in q3_range if lower <= q3_sub <= upper), 0)
-
+    st.session_state["q3_grade"] = q3_grade
     # ============================================================
     q4_ans = memo["q4"]["ans"]
     q4_sub = st.session_state["q4_shape"]
@@ -172,6 +174,8 @@ def grade_submission():
             q4_grade += 0.5
         case "nc":
             q4_grade += 0.0
+
+    st.session_state["q4_grade"] = q4_grade
 
     # ============================================================
     q5a_ans = memo["q5a"]["ans"]
@@ -194,6 +198,8 @@ def grade_submission():
         case "nc":
             q5b_grade += 0.0
 
+    st.session_state["q5_grade"] = q5a_grade + q5b_grade
+    
     # ============================================================
     q6a_ans = memo["q6a"]["ans"]
     q6b_ans = memo["q6b"]["ans"]
@@ -220,20 +226,29 @@ def grade_submission():
     else:
         q6c_grade += 0.0
 
+    st.session_state["q6_grade"] = q6a_grade + q6b_grade + q6c_grade
+    
     # ============================================================
     q7a_ans = memo["q7a"]["ans"]
     q7a_fc = memo["q7a"]["fc"]
     q7a_pc = memo["q7a"]["pc"]
     q7a_sub = float(st.session_state["q7a"])
+    q7a_units = st.session_state["q7a_unt"]
 
 
     q7a_grade = 0.0
     q7a_range = [
-        (q7a_ans - q7a_fc, q7a_ans + q7a_fc, 1.0),
-        (q7a_ans - q7a_pc, q7a_ans + q7a_pc, 0.5)
+        (q7a_ans - q7a_fc, q7a_ans + q7a_fc, 0.5),
+        (q7a_ans - q7a_pc, q7a_ans + q7a_pc, 0.25)
     ]
     
     q7a_grade += next((grade for lower, upper, grade in q7a_range if lower <= q7a_sub <= upper), 0)
+
+    match q7a_units:
+        case "fc":
+            q7a_grade += 0.5
+        case "nc":
+            q7a_grade += 0.0
 
     q7b_ans = memo["q7b"]["ans"]
     q7b_sub = st.session_state["q7b"]
@@ -255,14 +270,20 @@ def grade_submission():
         case "nc":
             q7c_grade += 0.0
 
+    st.session_state["q7_grade"] = q7a_grade + q7b_grade + q7c_grade
+
     # ============================================================
     q8a_ans = memo["q8a"]["ans"]
     q8b_ans = memo["q8b"]["ans"]
     q8c_ans = memo["q8c"]["ans"]
 
-    q8a_sub = st.session_state["q8a"]
-    q8b_sub = st.session_state["q8b"]
-    q8c_sub = st.session_state["q8c"]
+    q8a_sub = float(st.session_state["q8a"])
+    q8b_sub = float(st.session_state["q8b"])
+    q8c_sub = float(st.session_state["q8c"])
+
+    q8a_units = st.session_state["q8a_unt"]
+    q8b_units = st.session_state["q8b_unt"]
+    q8c_units = st.session_state["q8c_unt"]
 
     q8a_fc = memo["q8a"]["fc"]
     q8b_fc = memo["q8b"]["fc"]
@@ -277,27 +298,92 @@ def grade_submission():
     q8c_grade = 0.0
 
     q8a_range = [
-        (q8a_ans - q8a_fc, q8a_ans + q8a_fc, 1.0),
-        (q8a_ans - q8a_pc, q8a_ans + q8a_pc, 0.5)
+        (q8a_ans - q8a_fc, q8a_ans + q8a_fc, 0.5),
+        (q8a_ans - q8a_pc, q8a_ans + q8a_pc, 0.25)
     ]
 
     q8a_grade += next((grade for lower, upper, grade in q8a_range if lower <= q8a_sub <= upper), 0)
 
+    match q8a_units:
+        case "fc":
+            q8a_grade += 0.5
+        case "nc":
+            q8a_grade += 0.0
+
     q8b_range = [
-        (q8b_ans - q8b_fc, q8b_ans + q8b_fc, 1.0),
-        (q8b_ans - q8b_pc, q8b_ans + q8b_pc, 0.5)
+        (q8b_ans - q8b_fc, q8b_ans + q8b_fc, 0.5),
+        (q8b_ans - q8b_pc, q8b_ans + q8b_pc, 0.25)
     ]
 
     q8b_grade += next((grade for lower, upper, grade in q8b_range if lower <= q8b_sub <= upper), 0)
 
-    q8a_grade += next((grade for lower, upper, grade in q8a_range if lower <= q8a_sub <= upper), 0)
+    match q8b_units:
+        case "fc":
+            q8b_grade += 0.5
+        case "nc":
+            q8b_grade += 0.0
 
     q8c_range = [
-        (q8c_ans - q8c_fc, q8c_ans + q8c_fc, 1.0),
-        (q8c_ans - q8c_pc, q8c_ans + q8c_pc, 0.5)
+        (q8c_ans - q8c_fc, q8c_ans + q8c_fc, 0.5),
+        (q8c_ans - q8c_pc, q8c_ans + q8c_pc, 0.25)
     ]
 
     q8c_grade += next((grade for lower, upper, grade in q8c_range if lower <= q8c_sub <= upper), 0)
+
+    match q8c_units:
+        case "fc":
+            q8c_grade += 0.5
+        case "nc":
+            q8c_grade += 0.0
+
+    st.session_state["q8_grade"] = q8a_grade + q8b_grade + q8c_grade
+
+    st.session_state["final_grade"] = sum([st.session_state["q1_grade"],
+                                           st.session_state["q2_grade"],
+                                           st.session_state["q3_grade"],
+                                           st.session_state["q4_grade"],
+                                           st.session_state["q5_grade"],
+                                           st.session_state["q6_grade"],
+                                           st.session_state["q7_grade"],
+                                           st.session_state["q8_grade"]])
+    gc_file = "gradebook.csv"
+    gc = pd.read_csv(gc_file)
+    gc.loc[gc["Username"] == emplid,
+           "Semester test 2 Section A [Total Pts: 29 Score] |2953721"] = st.session_state["final_grade"]
+    gc.to_csv(gc_file, index = False)
+    
+
+    cv.putText(warped_img, str(st.session_state["final_grade"]), (850,455), cv.FONT_HERSHEY_SIMPLEX, 3.0, (0,0,255), 1)
+    cv.putText(warped_img, st.session_state["student"], (303,199), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
+
+    cv.putText(warped_img, str(q1a_grade),(2314,393), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
+    cv.putText(warped_img, str(q1b_grade),(2314,499), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
+    cv.putText(warped_img, str(q1c_grade),(2314,643), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
+
+    cv.putText(warped_img, str(q2a_grade),(1171,1332), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
+    cv.putText(warped_img, str(q2b_grade),(2227,1332), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
+
+    cv.putText(warped_img, str(q3_grade),(2314,1443), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
+
+    cv.putText(warped_img, str(q4_grade),(2314,1562), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
+
+    cv.putText(warped_img, str(q5a_grade),(2314,1668), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
+    cv.putText(warped_img, str(q5b_grade),(2314,1818), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
+
+    cv.putText(warped_img, str(q6a_grade),(2314,2324), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
+    cv.putText(warped_img, str(q6b_grade),(2314,2430), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
+    cv.putText(warped_img, str(q6c_grade),(2314,2530), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
+
+    cv.putText(warped_img, str(q7a_grade),(1170,2637), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
+    cv.putText(warped_img, str(q7b_grade),(2239,2637), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
+    cv.putText(warped_img, str(q7c_grade),(2314,2755), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
+
+    cv.putText(warped_img, str(q8a_grade),(817,3146), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
+    cv.putText(warped_img, str(q8b_grade),(1542,3146), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
+    cv.putText(warped_img, str(q8c_grade),(2248,3146), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
+
+    st.session_state["graded_submission"] = warped_img
+
     
     
     
@@ -305,6 +391,30 @@ def next_submission():
     st.session_state["script_index"] += 1
     del st.session_state["graded_submission"]
     # ==============================
+    st.session_state["q1a_sub"] = ""
+    st.session_state["q1a_unit"] = None
+    st.session_state["q1a_weathering"] = None
+    st.session_state["q1c_motivation"] = None
+    st.session_state["q2a"] = None
+    st.session_state["q2b"] = None
+    st.session_state["q3_sub"] = ""
+    st.session_state["q4_shape"] = None
+    st.session_state["q4_wrk"] = None
+    st.session_state["q5a"] = None
+    st.session_state["q5b"] = None
+    st.session_state["q6a"] = None
+    st.session_state["q6b"] = None
+    st.session_state["q6c"] = None
+    st.session_state["q7a"] = ""
+    st.session_state["q7a_unt"] = None
+    st.session_state["q7b"] = None
+    st.session_state["q7c"] = None
+    st.session_state["q8a"] = ""
+    st.session_state["q8a_unt"] = None
+    st.session_state["q8b"] = ""
+    st.session_state["q8b_unt"] = None
+    st.session_state["q8c"] = ""
+    st.session_state["q8c_unt"] = None
     
     
     st.rerun()
@@ -344,8 +454,6 @@ st.markdown(
 """,
     unsafe_allow_html=True,
 )
-
-st.set_page_config(layout="wide")
 
 title_col1, title_col2= st.columns(2)
 with title_col1:
@@ -473,11 +581,12 @@ if uploaded_files and grader.strip():
         shift = 8
         factor = 1 << shift
         zingg=pd.read_csv("zingg.csv")
-        radius = int(round(((300/25.4) * 2.0) * factor))
+        tlx = int(round(zingg.iloc[0,3] * factor))
+        tly = int(round(zingg.iloc[0,4] * factor))
+        brx = int(round(zingg.iloc[1,3] * factor))
+        bry = int(round(zingg.iloc[1,4] * factor))
 
-        ax = int(round(zingg["cvx"].item() * factor))
-        ay = int(round(zingg["cvy"].item() * factor))
-        cv.circle(warped_img, (ax,ay), radius, (0,0,255), 2, shift = shift)
+        cv.rectangle(warped_img, (tlx,tly), (brx,bry), (0,0,255), thickness = 2, shift = shift)
 
         st.session_state["submission"] = warped_img
 
@@ -588,19 +697,26 @@ if uploaded_files and grader.strip():
                              key = "q6c")
                 
             st.markdown("**Question 7**")
-            q7_col1, q7_col2, q7_col3 = st.columns(3)
+            q7_col1, q7_col2, q7_col3, q7_col4 = st.columns(4)
 
             with q7_col1:
                 st.text_input("Penetration Resistance", key = "q7a")
 
             with q7_col2:
+                st.selectbox("Units",
+                             ("fc","nc"),
+                             index = None,
+                             placeholder = "Make a selection...",
+                             key = "q7a_unt")
+                
+            with q7_col3:
                 st.selectbox("Site",
                              ("Site A", "Site B"),
                              index = None,
                              placeholder = "Make a selection...",
                              key = "q7b")
 
-            with q7_col3:
+            with q7_col4:
                 st.selectbox("Motivation",
                              ("fc", "pc", "nc"),
                              index = None,
@@ -608,17 +724,33 @@ if uploaded_files and grader.strip():
                              key = "q7c")
 
             st.markdown("**Question 8**")
-            q8_col1, q8_col2, q8_col3 = st.columns(3)
+            q8_col1, q8_col2, q8_col3, q8_col4 = st.columns(4)
 
             with q8_col1:
                 st.text_input("Plastic limit", key = "q8a")
-
-            with q8_col2:
-                st.text_input("Liquid limit", key = "q8b")
-
-            with q8_col3:
                 st.text_input("Plasticity index", key = "q8c")
 
+            with q8_col2:
+                st.selectbox("Units",
+                             ("fc","nc"),
+                             index = None,
+                             placeholder = "Make a selection...",
+                             key = "q8a_unt")
+                st.selectbox("Units",
+                             ("fc","nc"),
+                             index = None,
+                             placeholder = "Make a selection...",
+                             key = "q8c_unt")
+
+            with q8_col3:
+                st.text_input("Liquid limit", key = "q8b")
+
+            with q8_col4:
+                st.selectbox("Units",
+                             ("fc","nc"),
+                             index = None,
+                             placeholder = "Make a selection...",
+                             key = "q8b_unt")
             
 
         button_col1, button_col2, button_col3 = st.columns(3)
@@ -635,18 +767,15 @@ if uploaded_files and grader.strip():
             meta_info = PngInfo()
             meta_info.add_text("Grader", grader.strip())
             meta_info.add_text("GradedAt", grader_timestamp)
-            meta_info.add_text("final", st.session_state["final_grade"])
-            meta_info.add_text("q1", st.session_state["q1_grade"])
-            meta_info.add_text("q2", st.session_state["q2_grade"])  
-            meta_info.add_text("q3", st.session_state["q3_grade"])  
-            meta_info.add_text("q4", st.session_state["q4_grade"])  
-            meta_info.add_text("q5", st.session_state["q5_grade"])  
-            meta_info.add_text("q6", st.session_state["q6_grade"])  
-            meta_info.add_text("q7", st.session_state["q7_grade"])  
-            meta_info.add_text("q8", st.session_state["q8_grade"])  
-            meta_info.add_text("q9", st.session_state["q9_grade"])  
-            meta_info.add_text("q10", st.session_state["q10_grade"])  
-            meta_info.add_text("q11", st.session_state["q11_grade"]) 
+            meta_info.add_text("final", str(st.session_state["final_grade"]))
+            meta_info.add_text("q1", str(st.session_state["q1_grade"]))
+            meta_info.add_text("q2", str(st.session_state["q2_grade"]))  
+            meta_info.add_text("q3", str(st.session_state["q3_grade"]))  
+            meta_info.add_text("q4", str(st.session_state["q4_grade"]))  
+            meta_info.add_text("q5", str(st.session_state["q5_grade"]))  
+            meta_info.add_text("q6", str(st.session_state["q6_grade"]))  
+            meta_info.add_text("q7", str(st.session_state["q7_grade"]))  
+            meta_info.add_text("q8", str(st.session_state["q8_grade"]))
             buffer = io.BytesIO()
             final_img_pil.save(buffer, format="PNG", pnginfo=meta_info)
             
