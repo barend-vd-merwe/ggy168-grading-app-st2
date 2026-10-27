@@ -350,7 +350,6 @@ def grade_submission():
 
     conn = st.connection("gsheets", type=GSheetsConnection)
     gc = conn.read(ttl=0)
-    st.dataframe(gc)
     column_name = "Semester test 2 Section A [Total Pts: 29 Score] |2953721"
     gc.loc[gc["Username"] == emplid, column_name] = st.session_state["final_grade"]
     conn.update(data=gc)
