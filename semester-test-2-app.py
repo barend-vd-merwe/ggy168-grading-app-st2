@@ -758,34 +758,34 @@ if uploaded_files and grader.strip():
 
         button_col1, button_col2, button_col3 = st.columns(3)
 
-        with button_col1:
-            st.button("Grade", on_click=grade_submission)
+            with button_col1:
+                st.button("Grade", on_click=grade_submission)
 
-        if "graded_submission" in st.session_state:
-            final_img_rgb = cv.cvtColor(st.session_state["graded_submission"], cv.COLOR_BGR2RGB)
-            final_img_pil = Image.fromarray(final_img_rgb)
+            if "graded_submission" in st.session_state:
+                final_img_rgb = cv.cvtColor(st.session_state["graded_submission"], cv.COLOR_BGR2RGB)
+                final_img_pil = Image.fromarray(final_img_rgb)
 
-            filename = filename + ".png"
-            grader_timestamp = datetime.now().isoformat()
-            meta_info = PngInfo()
-            meta_info.add_text("Grader", grader.strip())
-            meta_info.add_text("GradedAt", grader_timestamp)
-            meta_info.add_text("final", str(st.session_state["final_grade"]))
-            meta_info.add_text("q1", str(st.session_state["q1_grade"]))
-            meta_info.add_text("q2", str(st.session_state["q2_grade"]))  
-            meta_info.add_text("q3", str(st.session_state["q3_grade"]))  
-            meta_info.add_text("q4", str(st.session_state["q4_grade"]))  
-            meta_info.add_text("q5", str(st.session_state["q5_grade"]))  
-            meta_info.add_text("q6", str(st.session_state["q6_grade"]))  
-            meta_info.add_text("q7", str(st.session_state["q7_grade"]))  
-            meta_info.add_text("q8", str(st.session_state["q8_grade"]))
-            buffer = io.BytesIO()
-            final_img_pil.save(buffer, format="PNG", pnginfo=meta_info)
-            
-            with button_col2:
-                st.download_button(label=f"Download {filename}", data=buffer, file_name=filename, mime="image/png")
+                filename = filename + ".png"
+                grader_timestamp = datetime.now().isoformat()
+                meta_info = PngInfo()
+                meta_info.add_text("Grader", grader.strip())
+                meta_info.add_text("GradedAt", grader_timestamp)
+                meta_info.add_text("final", str(st.session_state["final_grade"]))
+                meta_info.add_text("q1", str(st.session_state["q1_grade"]))
+                meta_info.add_text("q2", str(st.session_state["q2_grade"]))  
+                meta_info.add_text("q3", str(st.session_state["q3_grade"]))  
+                meta_info.add_text("q4", str(st.session_state["q4_grade"]))  
+                meta_info.add_text("q5", str(st.session_state["q5_grade"]))  
+                meta_info.add_text("q6", str(st.session_state["q6_grade"]))  
+                meta_info.add_text("q7", str(st.session_state["q7_grade"]))  
+                meta_info.add_text("q8", str(st.session_state["q8_grade"]))
+                buffer = io.BytesIO()
+                final_img_pil.save(buffer, format="PNG", pnginfo=meta_info)
 
-            if st.session_state["script_index"] < len(uploaded_files) - 1:
-                with button_col3:
-                    st.button("Next Submission", on_click = next_submission)
+                with button_col2:
+                    st.download_button(label=f"Download {filename}", data=buffer, file_name=filename, mime="image/png")
+
+                if st.session_state["script_index"] < len(uploaded_files) - 1:
+                    with button_col3:
+                        st.button("Next Submission", on_click = next_submission)
 
