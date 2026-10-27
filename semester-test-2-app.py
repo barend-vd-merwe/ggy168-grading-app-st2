@@ -756,7 +756,7 @@ if uploaded_files and grader.strip():
                                  key = "q8b_unt")
             
 
-        button_col1, button_col2, button_col3 = st.columns(3)
+            button_col1, button_col2, button_col3 = st.columns(3)
 
             with button_col1:
                 st.button("Grade", on_click=grade_submission)
