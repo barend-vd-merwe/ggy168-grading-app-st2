@@ -255,7 +255,7 @@ def grade_submission():
     q7b_sub = st.session_state["q7b"]
     q7b_grade = 0.0
 
-    if q7b_sub == q7a_ans:
+    if q7b_sub == q7b_ans:
         q7b_grade += 1.0
     else:
         q7b_grade += 0.0
