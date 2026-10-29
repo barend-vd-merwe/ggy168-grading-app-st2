@@ -77,9 +77,231 @@ def submission_viewer(img_url, height=1000, max_zoom_ratio=4.0, key="osd_viewer"
     st.iframe(html_osd, height=height)
 
 # ------------------------------------------------------------
+def dms_to_dd(dms):
+    raw = q10_sub.strip()
+    parts = raw.split("/")
+    nums = [float(p) for p in parts]
+    if len(nums) != 3:
+        st.error("Incorrect DMS entry. Entry must be dd/mm/ss (if there are no seconds, just enter 00).")
+    else:
+        try:
+            deg, minutes, sec = [float(p) for p in parts]
+            md = round(deg + (minutes / 60.0) + (sec / 3600.0), 4)
+        except:
+            st.error("Incorrect data entered.")
+    return md
+
 def grade_submission():
     with open (BASE_DIR / "tst2-memo.yaml", "r", encoding = "utf-8") as file:
         memo = yaml.safe_load(file)
+
+    q9a_ans = memo["q9a"]["ans"]
+    q9a_fc = memo["q9a"]["fc"]
+    q9a_pc = memo["q9a"]["pc"]
+    q9a_sub = float(st.session_state["q9a_val"])
+    q9a_sub_units = st.session_state["q9a_unt"]
+    q9a_grd = 0.0
+    
+    q9a_range = [
+        (q9a_ans - q9a_fc, q9a_ans + q9a_fc, 0.5),
+        (q9a_ans - q9a_pc, q9a_ans + q9a_pc, 0.25),
+    ]
+
+    q9a_grade += next((grade for lower, upper, grade in q9a_range if lower <= q9a_sub <= upper), 0)
+
+    if q9a_sub_units == "fc":
+        q9a_grade += 0.5
+    else:
+        q9a_grade += 0.0
+
+    q9b_ans = memo["q9b"]["ans"]
+    q9b_fc = memo["q9b"]["fc"]
+    q9b_pc = memo["q9b"]["pc"]
+    q9b_sub = float(st.session_state["q9b_val"])
+    q9b_sub_units = st.session_state["q9b_unt"]
+    q9b_grd = 0.0
+    
+    q9b_range = [
+        (q9b_ans - q9b_fc, q9b_ans + q9b_fc, 0.5),
+        (q9b_ans - q9b_pc, q9b_ans + q9b_pc, 0.25),
+    ]
+
+    q9b_grade += next((grade for lower, upper, grade in q9b_range if lower <= q9b_sub <= upper), 0)
+
+    if q9_sub_units == "fc":
+        q9b_grade += 0.5
+    else:
+        q9b_grade += 0.0
+
+    st.session_state["q9a_grd"] = q9a_grade
+    st.session_state["q9b_grd"] = q9b_grade
+
+    # ============================================================
+    q10_ans = memo["q10"]["ans"]
+    q10_fc = memo["q10"]["fc"]
+    q10_pc = memo["q10"]["pc"]
+    q10_sub = st.session_state["q10_val"]
+    q10_units = st.session_state["q10_unt"]
+    q10_grd = 0.0
+
+    if "/" in q10_sub:
+        md = dms_to_dd(q10_sub)
+    else:
+        md = float(q10_sub.strip())
+
+    g10_range = [
+        (q10_ans - q10_fc, q10_ans + q10_fc, 2.0),
+        (q10_ans - q10_pc, q10_ans + q10_pc, 1.0)
+    ]
+
+    q10_grd += next((grade for lower, upper, grade in q10_range if lowe <= md <= upper),0)
+
+    if q10_units == "fc":
+        q10_grd += 1.0
+    else:
+        q10_grd += 0.0
+
+    st.session_state["q10_grd"] = q10_grd
+
+    # ============================================================
+    q11a_ans = memo["q11a"]["ans"]
+    q11a_fc = memo["q11a"]["fc"]
+    q11a_pc = memo["q11a"]["pc"]
+    q11a_sub = st.session_state["q11a_val"]
+    q11a_units = st.session_state["q11a_unt"]
+    q11a_grd = 0.0
+
+    if "/" in q11a_sub:
+        mfb = dms_to_dd(q11a_sub)
+    else:
+        mfb = float(q11a_sub.strip())
+
+    q11a_range = [
+        (q11a_ans - q11a_fc, q11a_ans + q11a_fc, 1.0),
+        (q11a_ans - q11a_pc, q11a_ans + q11a_pc, 1.0)
+    ]
+
+    q11a_grd += next((grade for lower, upper, grade in q11a_range if lower <= mfb <= upper),0)
+
+    if q11a_units == "fc":
+        q11a_grd += 1.0
+    else:
+        q11a_grd += 0.0
+
+    st.session_state["q11a_grd"] = q11a_grd
+
+    q11b_ans = memo["q11b"]["ans"]
+    q11b_fc = memo["q11b"]["fc"]
+    q11b_pc = memo["q11b"]["pc"]
+    q11b_sub = st.session_state["q11b_val"]
+    q11b_units = st.session_state["q11b_unt"]
+    q11b_grd = 0.0
+
+    if "/" in q11b_sub:
+        mbb = dms_to_dd(q11b_sub)
+    else:
+        mbb = float(q11b_sub.strip())
+
+    q11b_range = [
+        (q11b_ans - q11b_fc, q11b_ans + q11b_fc, 1.0),
+        (q11b_ans - q11b_pc, q11b_ans + q11b_pc, 1.0)
+    ]
+
+    q11b_grd += next((grade for lower, upper, grade in q11b_range if lower <= mbb <= upper),0)
+
+    if q11b_units == "fc":
+        q11b_grd += 1.0
+    else:
+        q11b_grd += 0.0
+
+    st.session_state["q11b_grd"] = q11b_grd
+
+    # ============================================================
+    q12_ans = memo["q12"]["ans"]
+    q12_fc = memo["q12"]["fc"]
+    q12_pc = memo["q12"]["pc"]
+    q12_sub = st.session_state["q12_val"]
+    q12_units = st.session_state["q12_unt"]
+    q12_grd = 0.0
+
+    if "/" in q12_sub:
+        q12_tfb = dms_to_dd(q12_sub)
+    else:
+        q12_tfb = float(q12_sub.strip())
+
+    q12_range = [
+        (q12_ans - q12_fc, q12_ans + q12_fc, 2.0),
+        (q12_ans - q12_pc, q12_ans + q12_pc, 1.0)
+    ]
+
+    q12_grd += next((grade for lower, upper, grade in q12_range if lower <= q12_tfb <= upper),0)
+
+    if q12_units == "fc":
+        q12_grd += 1.0
+    else:
+        q12_grd += 0.0
+
+    st.session_state["q12_grd"] = q12_grd
+
+    # ============================================================
+    q13_ans = memo["q13"]["ans"]
+    q13_fc = memo["q13"]["fc"]
+    q13_pc = memo["q13"]["pc"]
+    q13_sub = float(st.session_state["q13_val"])
+    q13_units = st.session_state["q13_unt"]
+    q13_grd = 0.0
+
+    q13_range = [
+        (q13_ans - q13_fc, q13_ans + q13_fc, 2.0),
+        (q13_ans - q13_pc, q13_ans + q13_pc, 1.0)
+    ]
+
+    q13_grd += next((grade for lower, upper, grade in q13_range if lower <= q13_sub <= upper),0)
+
+    if q13_units == "fc":
+        q13_grd += 1.0
+    else:
+        q13_grd += 0.0
+
+    st.session_state["q13_grd"] = q13_grd
+
+    # ============================================================
+    q14_ans = memo["q14"]["ans"]
+    q14_fc = memo["q14"]["fc"]
+    q14_pc = memo["q14"]["pc"]
+    q14_sub = float(st.session_state["q14_val"])
+    q14_units = st.session_state["q14_unt"]
+    q14_work = st.session_state["q14_wrk"]
+    q14_grd = 0.0
+
+    q14_range = [
+        (q14_ans - q14_fc, q14_ans + q14_fc, 3.0),
+        (q14_ans - q14_pc, q14_ans + q14_pc, 1.5)
+    ]
+
+    q14_grd += next((grade for lower, upper, grade in q14_range if lower <= q14_sub <= upper),0)
+
+    if q14_units == "fc":
+        q14_grd += 1.0
+    else:
+        q14_grd += 0.0
+
+    match q14_work:
+        case "fc":
+            q14_grd += 4.0
+        case "pc":
+            q14_grd += 2.0
+        case "nc":
+            q14_grd += 0.0
+
+    st.session_state["q14_grd"] = q14_grd
+
+
+
+
+
+
+
 
 def next_submission():
     st.session_state["script_index"] += 1
@@ -324,7 +546,8 @@ if uploaded_files and grader.strip():
                 st.selectbox("Units",
                              ("fc", "nc"),
                              index = None,
-                             placeholder = "Make a selection...")
+                             placeholder = "Make a selection...",
+                             key = "q10_unt")
 
             st.markdown("**Question 11**")
             q11_col1, q11_col2 = st.columns(2)
