@@ -679,7 +679,7 @@ with tab1:
 
                 with q6_col1:
                     st.selectbox("Soil texture class",
-                                 ("Sandy Loam", "Other"),
+                                 ("Sandy loam", "Other"),
                                  index = None,
                                  placeholder = "Make a selection...",
                                  key = "q6a")
