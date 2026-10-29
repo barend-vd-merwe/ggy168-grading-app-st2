@@ -22,5 +22,5 @@ pages = st.navigation({
     "Semester Test 2" : [section_a, section_b]
 })
 
-st.set_page_config(page_title="GGY 168 Semester Test 2 Grading App", layout="wide")
+st.set_page_config(page_title="GGY 168 Grading App", layout="wide")
 pages.run()
