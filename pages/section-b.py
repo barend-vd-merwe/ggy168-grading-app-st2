@@ -78,7 +78,7 @@ def submission_viewer(img_url, height=1000, max_zoom_ratio=4.0, key="osd_viewer"
 
 # ------------------------------------------------------------
 def dms_to_dd(dms):
-    raw = q10_sub.strip()
+    raw = dms.strip()
     parts = raw.split("/")
     nums = [float(p) for p in parts]
     if len(nums) != 3:
@@ -107,12 +107,12 @@ def grade_submission():
         (q9a_ans - q9a_pc, q9a_ans + q9a_pc, 0.25),
     ]
 
-    q9a_grade += next((grade for lower, upper, grade in q9a_range if lower <= q9a_sub <= upper), 0)
+    q9a_grd += next((grade for lower, upper, grade in q9a_range if lower <= q9a_sub <= upper), 0)
 
     if q9a_sub_units == "fc":
-        q9a_grade += 0.5
+        q9a_grd += 0.5
     else:
-        q9a_grade += 0.0
+        q9a_grd += 0.0
 
     q9b_ans = memo["q9b"]["ans"]
     q9b_fc = memo["q9b"]["fc"]
@@ -126,15 +126,16 @@ def grade_submission():
         (q9b_ans - q9b_pc, q9b_ans + q9b_pc, 0.25),
     ]
 
-    q9b_grade += next((grade for lower, upper, grade in q9b_range if lower <= q9b_sub <= upper), 0)
+    q9b_grd += next((grade for lower, upper, grade in q9b_range if lower <= q9b_sub <= upper), 0)
 
-    if q9_sub_units == "fc":
-        q9b_grade += 0.5
+    if q9b_sub_units == "fc":
+        q9b_grd += 0.5
     else:
-        q9b_grade += 0.0
+        q9b_grd += 0.0
 
-    st.session_state["q9a_grd"] = q9a_grade
-    st.session_state["q9b_grd"] = q9b_grade
+    st.session_state["q9a_grd"] = q9a_grd
+    st.session_state["q9b_grd"] = q9b_grd
+    st.session_state["q9_grd"] = q9a_grd + q9b_grd
 
     # ============================================================
     q10_ans = memo["q10"]["ans"]
@@ -149,14 +150,14 @@ def grade_submission():
     else:
         md = float(q10_sub.strip())
 
-    g10_range = [
+    q10_range = [
         (q10_ans - q10_fc, q10_ans + q10_fc, 2.0),
         (q10_ans - q10_pc, q10_ans + q10_pc, 1.0)
     ]
 
-    q10_grd += next((grade for lower, upper, grade in q10_range if lowe <= md <= upper),0)
+    q10_grd += next((grade for lower, upper, grade in q10_range if lower <= md <= upper),0)
 
-    if q10_units == "fc":
+    if q10_units == "West":
         q10_grd += 1.0
     else:
         q10_grd += 0.0
@@ -215,6 +216,7 @@ def grade_submission():
         q11b_grd += 0.0
 
     st.session_state["q11b_grd"] = q11b_grd
+    st.session_state["q11_grd"] = q11a_grd + q11b_grd
 
     # ============================================================
     q12_ans = memo["q12"]["ans"]
@@ -286,28 +288,72 @@ def grade_submission():
     else:
         q14_grd += 0.0
 
+    st.session_state["q14_ans"] = q14_grd
+
     match q14_work:
         case "fc":
             q14_grd += 4.0
+            st.session_state["q14_plot"] = 4.0
         case "pc":
             q14_grd += 2.0
+            st.session_state["q14_plot"] = 2.0
         case "nc":
             q14_grd += 0.0
+            st.session_state["q14_plot"] = 0.0
 
     st.session_state["q14_grd"] = q14_grd
 
+    st.session_state["final_grade"] = sum([st.session_state["q9a_grd"],
+                                           st.session_state["q9b_grd"],
+                                           st.session_state["q10_grd"],
+                                           st.session_state["q11a_grd"],
+                                           st.session_state["q11b_grd"],
+                                           st.session_state["q12_grd"],
+                                           st.session_state["q13_grd"],
+                                           st.session_state["q14_grd"]])
 
+    conn = st.connection("gsheets", type=GSheetsConnection)
+    gc = conn.read(ttl=0)
+    column_name = "Semester test 2 Section B [Total Pts: 23 Score] |2953723"
+    gc.loc[gc["Username"] == emplid, column_name] = st.session_state["final_grade"]
+    conn.update(data=gc)
 
+    cv.putText(submission, str(st.session_state["final_grade"]), (850,455), cv.FONT_HERSHEY_SIMPLEX, 3.0, (0,0,255), 1)
+    cv.putText(submission, st.session_state["student"], (303,199), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
 
+    cv.putText(submission, str(st.session_state["q9a_grd"]),(2226,367), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
+    cv.putText(submission, str(st.session_state["q9b_grd"]),(2226,473), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
+    cv.putText(submission, str(st.session_state["q10_grd"]),(2226,573), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
+    cv.putText(submission, str(st.session_state["q11a_grd"]),(2226,667), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
+    cv.putText(submission, str(st.session_state["q11b_grd"]),(2226,767), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
+    cv.putText(submission, str(st.session_state["q12_grd"]),(2226,861), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
+    cv.putText(submission, str(st.session_state["q13_grd"]),(2226,961), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
+    cv.putText(submission, str(st.session_state["q14_ans"]),(2226,1055), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
+    cv.putText(submission, str(st.session_state["q14_plot"]),(1863,2767), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
 
-
-
-
+    st.session_state["graded_submission"] = submission
+    
 def next_submission():
     st.session_state["script_index"] += 1
     del st.session_state["graded_submission"]
     # ============================================================
-
+    st.session_state["q9a_val"] = ""
+    st.session_state["q9b_val"] = ""
+    st.session_state["q9a_unt"] = None
+    st.session_state["q9b_unt"] = None
+    st.session_state["q10_val"] = ""
+    st.session_state["q10_unt"] = None
+    st.session_state["q11a_val"] = ""
+    st.session_state["q11b_val"] = ""
+    st.session_state["q11a_unt"] = None
+    st.session_state["q11b_unt"] = None
+    st.session_state["q12_val"] = ""
+    st.session_state["q12_unt"] = None
+    st.session_state["q13_val"] = ""
+    st.session_state["q13_unt"] = None
+    st.session_state["q14_val"] = ""
+    st.session_state["q14_unt"] = None
+    st.session_state["q14_direction"] = 0
     # ============================================================
     st.rerun()
 
@@ -391,120 +437,132 @@ with st.sidebar:
     st.button("Clear", on_click = clear_files)
 
 if uploaded_files and grader.strip():
-    total_scripts = len(uploaded_files)
-    current_script = st.session_state["script_index"] + 1
-    progress = min(current_script / total_scripts, 1.0)
-    st.progress(progress)
-
-    # extract student details from img filename
-    image = uploaded_files[st.session_state["script_index"]]
-    filename = image.name
-    filename = filename.replace(".png","")
-    surname, name, emplid = filename.split("_")
-    st.session_state["student"] = f"{name} {surname} ({emplid})"
-
-    # store the submission in memory as cv2 object
-    img_bytes = np.frombuffer(image.getvalue(), dtype=np.uint8)
-    cv_img = cv.imdecode(img_bytes, cv.IMREAD_COLOR)
-    img_gray = cv.cvtColor(cv_img, cv.COLOR_BGR2GRAY)
-
-    # prepare values for detector
-    aruco_dictionary = cv.aruco.getPredefinedDictionary(cv.aruco.DICT_4X4_50)
-    parameters = cv.aruco.DetectorParameters()
-    parameters.cornerRefinementMethod = cv.aruco.CORNER_REFINE_SUBPIX
-    parameters.cornerRefinementWinSize = 5
-    parameters.cornerRefinementMaxIterations = 100
-    parameters.cornerRefinementMinAccuracy = 0.01
-
-    # instantiate detector
-    detector = cv.aruco.ArucoDetector(aruco_dictionary, parameters)
-
-    try:
-        # use detector to detect aruco markers
-        corners, ids, _ = detector.detectMarkers(img_gray)
-
-        # get the coordinates of the center points of each aruco marker
-        ids = ids.flatten().tolist()
-
-        aruco_0_index = ids.index(0)
-        aruco_0_corners = corners[aruco_0_index]
-        aruco_0_corners_rshp = aruco_0_corners.reshape((4,2))
-
-        aruco_1_index = ids.index(1)
-        aruco_1_corners = corners[aruco_1_index]
-        aruco_1_corners_rshp = aruco_1_corners.reshape((4,2))
-
-        aruco_2_index = ids.index(2)
-        aruco_2_corners = corners[aruco_2_index]
-        aruco_2_corners_rshp = aruco_2_corners.reshape((4,2))
-
-        aruco_3_index = ids.index(3)
-        aruco_3_corners = corners[aruco_3_index]
-        aruco_3_corners_rshp = aruco_3_corners.reshape((4,2))
-
-        aruco_markers = [aruco_0_corners_rshp,
-                         aruco_1_corners_rshp,
-                         aruco_2_corners_rshp,
-                         aruco_3_corners_rshp]
-
-        current_coords_list = []
-        for marker in aruco_markers:
-            for i in range(4):
-                x_coord = marker[i,0]
-                y_coord = marker[i,1]
-                current_coords_list.append([x_coord, y_coord])
-        current_coords = np.array(current_coords_list, dtype=np.float32)
-
-        # Set target coordinates
-
-        ac = pd.read_csv(BASE_DIR / "aruco.csv")
-
-        target_coords_list = []
-
-        for i in range(len(ac)):
-            x_coord = ac.iloc[i,4]
-            y_coord = ac.iloc[i,5]
-            target_coords_list.append([x_coord, y_coord])
-
-        target_coords = np.array(target_coords_list, dtype=np.float32)
-
-        # transform the image
-        homography_matrix, mask = cv.findHomography(current_coords, target_coords, cv.RANSAC, 5.0)
-        warped_img = cv.warpPerspective(cv_img,
-                                        homography_matrix,
-                                        (2480, 3508),
-                                        flags=cv.INTER_LINEAR,
-                                        borderMode=cv.BORDER_CONSTANT,
-                                        borderValue=(255, 255, 255))
-        # add compass intervals
-        shift = 8
-        factor = 1 << shift
-        bubble_radius = int(round(24 * factor))
-
-        ci = pd.read_csv(BASE_DIR / "compass-intervals.csv")
-
-        for i in range(len(ci)):
-            rawx = ci.iloc[i]["cvx"]
-            rawy = ci.iloc[i]["cvy"]
-            cix = int(round(rawx * factor))
-            ciy = int(round(rawy * factor))
-            cv.circle(warped_img, (cix, ciy), bubble_radius, (0,0,255), 2, shift = shift)
-
-        st.session_state["submission"] = warped_img
-
-        processed_img = cv.imencode(".png",warped_img)[1]
-        b64_str = base64.b64encode(processed_img).decode("utf-8")
-        img_url = f"data:image/png;base64,{b64_str}"
-
-
-    except Exception as e:
-        st.error(f"Processing failed: {e}")
-        img_url = None
-
     # display submission and grading tools in two cols
     col1, col2 = st.columns(2)
+    with col1:
+        st.selectbox("Direction of measurement",
+                     ("Mox to Kelt", "Kelt to Mox"),
+                     index = 0,
+                     key = "q14_direction")
 
-    with col1:    
+        total_scripts = len(uploaded_files)
+        current_script = st.session_state["script_index"] + 1
+        progress = min(current_script / total_scripts, 1.0)
+        st.progress(progress)
+
+        # extract student details from img filename
+        image = uploaded_files[st.session_state["script_index"]]
+        filename = image.name
+        filename = filename.replace(".png","")
+        surname, name, emplid = filename.split("_")
+        st.session_state["student"] = f"{name} {surname} ({emplid})"
+
+        # store the submission in memory as cv2 object
+        img_bytes = np.frombuffer(image.getvalue(), dtype=np.uint8)
+        cv_img = cv.imdecode(img_bytes, cv.IMREAD_COLOR)
+        img_gray = cv.cvtColor(cv_img, cv.COLOR_BGR2GRAY)
+
+        # prepare values for detector
+        aruco_dictionary = cv.aruco.getPredefinedDictionary(cv.aruco.DICT_4X4_50)
+        parameters = cv.aruco.DetectorParameters()
+        parameters.cornerRefinementMethod = cv.aruco.CORNER_REFINE_SUBPIX
+        parameters.cornerRefinementWinSize = 5
+        parameters.cornerRefinementMaxIterations = 100
+        parameters.cornerRefinementMinAccuracy = 0.01
+
+        # instantiate detector
+        detector = cv.aruco.ArucoDetector(aruco_dictionary, parameters)
+
+        try:
+            # use detector to detect aruco markers
+            corners, ids, _ = detector.detectMarkers(img_gray)
+
+            # get the coordinates of the center points of each aruco marker
+            ids = ids.flatten().tolist()
+
+            aruco_0_index = ids.index(0)
+            aruco_0_corners = corners[aruco_0_index]
+            aruco_0_corners_rshp = aruco_0_corners.reshape((4,2))
+
+            aruco_1_index = ids.index(1)
+            aruco_1_corners = corners[aruco_1_index]
+            aruco_1_corners_rshp = aruco_1_corners.reshape((4,2))
+
+            aruco_2_index = ids.index(2)
+            aruco_2_corners = corners[aruco_2_index]
+            aruco_2_corners_rshp = aruco_2_corners.reshape((4,2))
+
+            aruco_3_index = ids.index(3)
+            aruco_3_corners = corners[aruco_3_index]
+            aruco_3_corners_rshp = aruco_3_corners.reshape((4,2))
+
+            aruco_markers = [aruco_0_corners_rshp,
+                             aruco_1_corners_rshp,
+                             aruco_2_corners_rshp,
+                             aruco_3_corners_rshp]
+
+            current_coords_list = []
+            for marker in aruco_markers:
+                for i in range(4):
+                    x_coord = marker[i,0]
+                    y_coord = marker[i,1]
+                    current_coords_list.append([x_coord, y_coord])
+            current_coords = np.array(current_coords_list, dtype=np.float32)
+
+            # Set target coordinates
+
+            ac = pd.read_csv(BASE_DIR / "aruco.csv")
+
+            target_coords_list = []
+
+            for i in range(len(ac)):
+                x_coord = ac.iloc[i,4]
+                y_coord = ac.iloc[i,5]
+                target_coords_list.append([x_coord, y_coord])
+
+            target_coords = np.array(target_coords_list, dtype=np.float32)
+
+            # transform the image
+            homography_matrix, mask = cv.findHomography(current_coords, target_coords, cv.RANSAC, 5.0)
+            warped_img = cv.warpPerspective(cv_img,
+                                            homography_matrix,
+                                            (2480, 3508),
+                                            flags=cv.INTER_LINEAR,
+                                            borderMode=cv.BORDER_CONSTANT,
+                                            borderValue=(255, 255, 255))
+            # add compass intervals
+            shift = 8
+            factor = 1 << shift
+            bubble_radius = int(round(24 * factor))
+
+            if st.session_state["q14_direction"] == "Mox to Kelt":
+                submission = warped_img.copy()
+                ci = pd.read_csv(BASE_DIR / "mk-compass-intervals.csv")
+                for i in range(len(ci)):
+                    rawx = ci.iloc[i]["cvx"]
+                    rawy = ci.iloc[i]["cvy"]
+                    cix = int(round(rawx * factor))
+                    ciy = int(round(rawy * factor))
+                    cv.circle(submission, (cix, ciy), bubble_radius, (0,0,255), 2, shift = shift)
+            else:
+                submission = warped_img.copy()
+                ci = pd.read_csv(BASE_DIR / "km-compass-intervals.csv")
+                for i in range(len(ci)):
+                    rawx = ci.iloc[i]["cvx"]
+                    rawy = ci.iloc[i]["cvy"]
+                    cix = int(round(rawx * factor))
+                    ciy = int(round(rawy * factor))
+                    cv.circle(submission, (cix, ciy), bubble_radius, (0,0,255), 2, shift = shift)
+            
+            processed_img = cv.imencode(".png",submission)[1]
+            b64_str = base64.b64encode(processed_img).decode("utf-8")
+            img_url = f"data:image/png;base64,{b64_str}"
+
+
+        except Exception as e:
+            st.error(f"Processing failed: {e}")
+            img_url = None
+  
         submission_viewer(img_url)
 
     with col2:
@@ -544,7 +602,7 @@ if uploaded_files and grader.strip():
 
             with q10_col2:
                 st.selectbox("Units",
-                             ("fc", "nc"),
+                             ("West", "Other"),
                              index = None,
                              placeholder = "Make a selection...",
                              key = "q10_unt")
@@ -615,3 +673,33 @@ if uploaded_files and grader.strip():
                              key = "q14_wrk")
             
 
+        button_col1, button_col2, button_col3 = st.columns(3)
+
+        with button_col1:
+            st.button("Grade", on_click=grade_submission)
+
+        if "graded_submission" in st.session_state:
+            final_img_rgb = cv.cvtColor(st.session_state["graded_submission"], cv.COLOR_BGR2RGB)
+            final_img_pil = Image.fromarray(final_img_rgb)
+
+            filename = filename + ".png"
+            grader_timestamp = datetime.now().isoformat()
+            meta_info = PngInfo()
+            meta_info.add_text("Grader", grader.strip())
+            meta_info.add_text("GradedAt", grader_timestamp)
+            meta_info.add_text("final", str(st.session_state["final_grade"]))
+            meta_info.add_text("q9", str(st.session_state["q9_grd"]))
+            meta_info.add_text("q10", str(st.session_state["q10_grd"]))  
+            meta_info.add_text("q11", str(st.session_state["q11_grd"]))  
+            meta_info.add_text("q12", str(st.session_state["q12_grd"]))  
+            meta_info.add_text("q13", str(st.session_state["q13_grd"]))  
+            meta_info.add_text("q14", str(st.session_state["q14_grd"]))
+            buffer = io.BytesIO()
+            final_img_pil.save(buffer, format="PNG", pnginfo=meta_info)
+
+            with button_col2:
+                st.download_button(label=f"Download {filename}", data=buffer, file_name=filename, mime="image/png")
+
+            if st.session_state["script_index"] < len(uploaded_files) - 1:
+                with button_col3:
+                    st.button("Next Submission", on_click = next_submission)
