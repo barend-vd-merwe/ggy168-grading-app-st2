@@ -352,7 +352,7 @@ def grade_submission():
                                            st.session_state["q8_grade"]])
 
     conn = st.connection("gsheets", type=GSheetsConnection)
-    spreadsheet_url = st.secrets["connections"]["gsheets"]["spreadsheet"]
+    spreadsheet_url = st.secrets.get("spreadsheet")
     gc = conn.read(spreadsheet = spreadsheet_url,
                    ttl=0)
     column_name = "Semester test 2 Section A [Total Pts: 29 Score] |2953721"
