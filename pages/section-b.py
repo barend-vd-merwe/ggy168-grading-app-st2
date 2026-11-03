@@ -253,17 +253,25 @@ def grade_submission():
     q13_units = st.session_state["q13_unt"]
     q13_grd = 0.0
 
+    match q13_units:
+        case "m":
+            q13_sub = q13_sub * 1.0
+            q13_grd += 1.0
+        case "km":
+            q13_sub = q13_sub * 1000.0
+            q13_grd += 1.0
+        case "mm":
+            q13_sub = q13_sub / 1000.0
+            q13_grd += 1.0
+        case "nc":
+            q13_grd += 0.0
+    
     q13_range = [
         (q13_ans - q13_fc, q13_ans + q13_fc, 2.0),
         (q13_ans - q13_pc, q13_ans + q13_pc, 1.0)
     ]
 
     q13_grd += next((grade for lower, upper, grade in q13_range if lower <= q13_sub <= upper),0)
-
-    if q13_units == "fc":
-        q13_grd += 1.0
-    else:
-        q13_grd += 0.0
 
     st.session_state["q13_grd"] = q13_grd
 
@@ -276,6 +284,17 @@ def grade_submission():
     q14_work = st.session_state["q14_wrk"]
     q14_grd = 0.0
 
+    match q14_units:
+        case "m":
+            q14_sub = q14_sub * 1.0
+            q14_grd += 1.0
+        case "km":
+            q14_sub = q14_sub * 1000.0
+            q14_grd += 1.0
+        case "mm":
+            q14_sub = q14_sub / 1000.0
+            q14_grd += 1.0
+    
     q14_range = [
         (q14_ans - q14_fc, q14_ans + q14_fc, 3.0),
         (q14_ans - q14_pc, q14_ans + q14_pc, 1.5)
@@ -652,7 +671,7 @@ if uploaded_files and grader.strip() and st.session_state["user_pin"].strip() ==
 
             with q13_col2:
                 st.selectbox("Units",
-                             ("fc","nc"),
+                             ("m","km","mm","nc"),
                              index = None,
                              placeholder = "Make a selection...",
                              key = "q13_unt")
@@ -665,7 +684,7 @@ if uploaded_files and grader.strip() and st.session_state["user_pin"].strip() ==
 
             with q14_col2:
                 st.selectbox("Units",
-                             ("fc","nc"),
+                             ("m","km","mm","nc"),
                              index = None,
                              placeholder = "Make a selection...",
                              key = "q14_unt")
