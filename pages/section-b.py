@@ -354,6 +354,7 @@ def next_submission():
     st.session_state["q14_val"] = ""
     st.session_state["q14_unt"] = None
     st.session_state["q14_direction"] = 0
+    st.session_state["q14_wrk"] = None
     # ============================================================
     st.rerun()
 
@@ -465,7 +466,6 @@ if uploaded_files and grader.strip() and st.session_state["user_pin"].strip() ==
         # store the submission in memory as cv2 object
         img_bytes = np.frombuffer(image.getvalue(), dtype=np.uint8)
         cv_img = cv.imdecode(img_bytes, cv.IMREAD_COLOR)
-        img_gray = cv.cvtColor(cv_img, cv.COLOR_BGR2GRAY)
 
         # prepare values for detector
         aruco_dictionary = cv.aruco.getPredefinedDictionary(cv.aruco.DICT_4X4_50)
@@ -480,7 +480,7 @@ if uploaded_files and grader.strip() and st.session_state["user_pin"].strip() ==
 
         try:
             # use detector to detect aruco markers
-            corners, ids, _ = detector.detectMarkers(img_gray)
+            corners, ids, _ = detector.detectMarkers(cv_img)
 
             # get the coordinates of the center points of each aruco marker
             ids = ids.flatten().tolist()
