@@ -430,13 +430,18 @@ if "uploader_key" not in st.session_state:
 # load class list and submission
 with st.sidebar:
     grader = st.text_input("Name of grader", key="graderName")
+    pin = st.text_input("Enter PIN number",
+                        type = "password",
+                        key = "user_pin")
     uploaded_files = st.file_uploader("Select the student submission",
                                       type = ["png"],
                                       accept_multiple_files = True,
                                       key = str(st.session_state["uploader_key"]))
     st.button("Clear", on_click = clear_files)
 
-if uploaded_files and grader.strip():
+valid_pin = st.secrets.get("secret_pin")
+    
+if uploaded_files and grader.strip() and st.session_state["user_pin"].strip() == valid_pin:
     # display submission and grading tools in two cols
     col1, col2 = st.columns(2)
     with col1:

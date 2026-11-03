@@ -384,9 +384,6 @@ def grade_submission():
     cv.putText(warped_img, str(q8c_grade),(2248,3146), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
 
     st.session_state["graded_submission"] = warped_img
-
-    
-    
     
 def next_submission():
     st.session_state["script_index"] += 1
@@ -416,8 +413,7 @@ def next_submission():
     st.session_state["q8b_unt"] = None
     st.session_state["q8c"] = ""
     st.session_state["q8c_unt"] = None
-    
-    
+        
     st.rerun()
 
 def clear_files():
@@ -486,6 +482,9 @@ if "uploader_key" not in st.session_state:
 # load class list and submission
 with st.sidebar:
     grader = st.text_input("Name of grader", key="graderName")
+    pin = st.text_input("Enter PIN number",
+                        type = "password",
+                        key = "user_pin")
     uploaded_files = st.file_uploader("Select the student submission",
                                       type = ["png"],
                                       accept_multiple_files = True,
