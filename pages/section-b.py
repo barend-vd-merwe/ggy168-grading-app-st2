@@ -338,26 +338,22 @@ def grade_submission():
     gc.loc[gc["Username"] == emplid, column_name] = st.session_state["final_grade"]
     conn.update(data=gc)
 
-    cv.putText(submission, str(st.session_state["final_grade"]), (850,455), cv.FONT_HERSHEY_SIMPLEX, 3.0, (0,0,255), 1)
-    cv.putText(submission, st.session_state["student"], (303,199), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
+    cv.putText(st.session_state["submission"], str(st.session_state["final_grade"]), (850,455), cv.FONT_HERSHEY_SIMPLEX, 3.0, (0,0,255), 1)
+    cv.putText(st.session_state["submission"], st.session_state["student"], (303,199), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
 
-    cv.putText(submission, str(st.session_state["q9a_grd"]),(2226,367), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
-    cv.putText(submission, str(st.session_state["q9b_grd"]),(2226,473), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
-    cv.putText(submission, str(st.session_state["q10_grd"]),(2226,573), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
-    cv.putText(submission, str(st.session_state["q11a_grd"]),(2226,667), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
-    cv.putText(submission, str(st.session_state["q11b_grd"]),(2226,767), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
-    cv.putText(submission, str(st.session_state["q12_grd"]),(2226,861), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
-    cv.putText(submission, str(st.session_state["q13_grd"]),(2226,961), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
-    cv.putText(submission, str(st.session_state["q14_ans"]),(2226,1055), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
-    cv.putText(submission, str(st.session_state["q14_plot"]),(1863,2767), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
+    cv.putText(st.session_state["submission"], str(st.session_state["q9a_grd"]),(2226,367), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
+    cv.putText(st.session_state["submission"], str(st.session_state["q9b_grd"]),(2226,473), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
+    cv.putText(st.session_state["submission"], str(st.session_state["q10_grd"]),(2226,573), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
+    cv.putText(st.session_state["submission"], str(st.session_state["q11a_grd"]),(2226,667), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
+    cv.putText(st.session_state["submission"], str(st.session_state["q11b_grd"]),(2226,767), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
+    cv.putText(st.session_state["submission"], str(st.session_state["q12_grd"]),(2226,861), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
+    cv.putText(st.session_state["submission"], str(st.session_state["q13_grd"]),(2226,961), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
+    cv.putText(st.session_state["submission"], str(st.session_state["q14_ans"]),(2226,1055), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
+    cv.putText(st.session_state["submission"], str(st.session_state["q14_plot"]),(1863,2767), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
 
-    st.session_state["graded_submission"] = submission
-    del submission
-    gc.collect()
-    
 def next_submission():
     st.session_state["script_index"] += 1
-    del st.session_state["graded_submission"]
+    del st.session_state["submission"]
     # ============================================================
     st.session_state["q9a_val"] = ""
     st.session_state["q9b_val"] = ""
@@ -383,8 +379,8 @@ def next_submission():
 def clear_files():
      st.session_state["uploader_key"] += 1
      del st.session_state["script_index"]
-     if "graded_submission" in st.session_state:
-         del st.session_state["graded_submission"]
+     if "submission" in st.session_state:
+         del st.session_state["submission"]
 
 # ============================================================
 # ============================================================
@@ -574,6 +570,7 @@ if uploaded_files and grader.strip() and st.session_state["user_pin"].strip() ==
                     cix = int(round(rawx * factor))
                     ciy = int(round(rawy * factor))
                     cv.circle(submission, (cix, ciy), bubble_radius, (0,0,255), 2, shift = shift)
+                    st.session_state["submission"] = submission
             else:
                 submission = warped_img.copy()
                 del warped_img
@@ -586,6 +583,7 @@ if uploaded_files and grader.strip() and st.session_state["user_pin"].strip() ==
                     cix = int(round(rawx * factor))
                     ciy = int(round(rawy * factor))
                     cv.circle(submission, (cix, ciy), bubble_radius, (0,0,255), 2, shift = shift)
+                    st.session_state["submission"] = submission
             
             _, disp_img = cv.imencode(".jpg",submission, [int(cv.IMWRITE_JPEG_QUALITY), 80])
             b64_str = base64.b64encode(disp_img).decode("utf-8")
@@ -711,8 +709,8 @@ if uploaded_files and grader.strip() and st.session_state["user_pin"].strip() ==
         with button_col1:
             st.button("Grade", on_click=grade_submission)
 
-        if "graded_submission" in st.session_state:
-            final_img_rgb = cv.cvtColor(st.session_state["graded_submission"], cv.COLOR_BGR2RGB)
+        if "submission" in st.session_state:
+            final_img_rgb = cv.cvtColor(st.session_state["submission"], cv.COLOR_BGR2RGB)
             final_img_pil = Image.fromarray(final_img_rgb)
 
             filename = filename + ".png"
