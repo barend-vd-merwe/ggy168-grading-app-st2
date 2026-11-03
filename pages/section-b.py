@@ -12,6 +12,7 @@ from datetime import datetime
 import yaml
 from streamlit_gsheets import GSheetsConnection
 from pathlib import Path
+import gc
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -351,6 +352,8 @@ def grade_submission():
     cv.putText(submission, str(st.session_state["q14_plot"]),(1863,2767), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
 
     st.session_state["graded_submission"] = submission
+    del submission
+    gc.collect()
     
 def next_submission():
     st.session_state["script_index"] += 1
@@ -561,6 +564,9 @@ if uploaded_files and grader.strip() and st.session_state["user_pin"].strip() ==
 
             if st.session_state["q14_direction"] == "Mox to Kelt":
                 submission = warped_img.copy()
+                del warped_img
+                del cv_img
+                gc.collect()
                 ci = pd.read_csv(BASE_DIR / "mk-compass-intervals.csv")
                 for i in range(len(ci)):
                     rawx = ci.iloc[i]["cvx"]
@@ -570,6 +576,9 @@ if uploaded_files and grader.strip() and st.session_state["user_pin"].strip() ==
                     cv.circle(submission, (cix, ciy), bubble_radius, (0,0,255), 2, shift = shift)
             else:
                 submission = warped_img.copy()
+                del warped_img
+                del cv_img
+                gc.collect()
                 ci = pd.read_csv(BASE_DIR / "km-compass-intervals.csv")
                 for i in range(len(ci)):
                     rawx = ci.iloc[i]["cvx"]
@@ -578,8 +587,8 @@ if uploaded_files and grader.strip() and st.session_state["user_pin"].strip() ==
                     ciy = int(round(rawy * factor))
                     cv.circle(submission, (cix, ciy), bubble_radius, (0,0,255), 2, shift = shift)
             
-            processed_img = cv.imencode(".png",submission)[1]
-            b64_str = base64.b64encode(processed_img).decode("utf-8")
+            _, disp_img = cv.imencode(".jpg",submission, [int(cv.IMWRITE_JPEG_QUALITY), 80])
+            b64_str = base64.b64encode(disp_img).decode("utf-8")
             img_url = f"data:image/png;base64,{b64_str}"
 
 
