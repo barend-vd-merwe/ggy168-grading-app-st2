@@ -339,7 +339,7 @@ def grade_submission():
     conn.update(data=gc)
 
     cv.putText(st.session_state["submission"], str(st.session_state["final_grade"]), (850,455), cv.FONT_HERSHEY_SIMPLEX, 3.0, (0,0,255), 1)
-    cv.putText(st.session_state["submission"], st.session_state["studen t"], (303,199), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
+    cv.putText(st.session_state["submission"], st.session_state["student"], (303,199), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
 
     cv.putText(st.session_state["submission"], str(st.session_state["q9a_grd"]),(2226,367), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
     cv.putText(st.session_state["submission"], str(st.session_state["q9b_grd"]),(2226,473), cv.FONT_HERSHEY_SIMPLEX, 2.0, (0,0,255), 1)
