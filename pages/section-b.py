@@ -18,7 +18,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # custom functions
 # ------------------------------------------------------------
-def submission_viewer(img_url, height=1000, max_zoom_ratio=4.0, key="osd_viewer"):
+def submission_viewer(img_url, height=1250, max_zoom_ratio=4.0, key="osd_viewer"):
     # openseadragon
     html_osd = f"""
     <!DOCTYPE html>
@@ -353,6 +353,35 @@ def grade_submission():
 
     st.session_state["graded_submission"] = st.session_state["submission"]
 
+def set_q9_blank():
+    st.session_state["q9a_val"] = "0.0"
+    st.session_state["q9b_val"] = "0.0"
+    st.session_state["q9a_unt"] = "nc"
+    st.session_state["q9b_unt"] = "nc"
+
+def set_q10_blank():
+    st.session_state["q10_val"] = "99/99/99"
+    st.session_state["q10_unt"] = "Other"
+
+def set_q11_blank():
+    st.session_state["q11a_val"] = "0.0"
+    st.session_state["q11b_val"] = "0.0"
+    st.session_state["q11a_unt"] = "nc"
+    st.session_state["q11b_unt"] = "nc"
+
+def set_q12_blank():
+    st.session_state["q12_val"] = "0.0"
+    st.session_state["q12_unt"] = "nc"
+
+def set_q13_blank():
+    st.session_state["q13_val"] = "0.0"
+    st.session_state["q13_unt"] = "nc"
+
+def set_q14_blank():
+    st.session_state["q14_val"] = "0.0"
+    st.session_state["q14_unt"] = "nc"
+    st.session_state["q14_wrk"] = "nc"
+    
 def next_submission():
     st.session_state["script_index"] += 1
     del st.session_state["graded_submission"]
@@ -461,7 +490,7 @@ with st.sidebar:
     st.button("Clear", on_click = clear_files)
 
 valid_pin = st.secrets.get("secret_pin")
-    
+
 if uploaded_files and grader.strip() and st.session_state["user_pin"].strip() == valid_pin:
     # display submission and grading tools in two cols
     col1, col2 = st.columns(2)
@@ -609,8 +638,11 @@ if uploaded_files and grader.strip() and st.session_state["user_pin"].strip() ==
 
         with st.expander("Questions", expanded = True):
             st.markdown("**Question 9**")
+            st.button("Blank",
+                      on_click=set_q9_blank,
+                      key = "q9_blank")
             q9_col1, q9_col2 = st.columns(2)
-
+            
             with q9_col1:
                 st.text_input("Tfb (Bryn to Mox)", key = "q9a_val")
                 st.text_input("Tbb (Bryn to Mox)", key = "q9b_val")
@@ -626,8 +658,12 @@ if uploaded_files and grader.strip() and st.session_state["user_pin"].strip() ==
                              index = None,
                              placeholder = "Make a selection...",
                              key = "q9b_unt")
-
+            
+                
             st.markdown("**Question 10**")
+            st.button("Blank",
+                      on_click=set_q10_blank,
+                      key = "q10_blank")
             q10_col1, q10_col2 = st.columns(2)
 
             with q10_col1:
@@ -641,6 +677,9 @@ if uploaded_files and grader.strip() and st.session_state["user_pin"].strip() ==
                              key = "q10_unt")
 
             st.markdown("**Question 11**")
+            st.button("Blank",
+                      on_click=set_q11_blank,
+                      key = "q11_blank")
             q11_col1, q11_col2 = st.columns(2)
 
             with q11_col1:
@@ -660,6 +699,9 @@ if uploaded_files and grader.strip() and st.session_state["user_pin"].strip() ==
                              key = "q11b_unt")
 
             st.markdown("**Question 12**")
+            st.button("Blank",
+                      on_click=set_q12_blank,
+                      key = "q12_blank")
             q12_col1, q12_col2 = st.columns(2)
 
             with q12_col1:
@@ -673,6 +715,9 @@ if uploaded_files and grader.strip() and st.session_state["user_pin"].strip() ==
                              key = "q12_unt")
 
             st.markdown("**Question 13**")
+            st.button("Blank",
+                      on_click=set_q13_blank,
+                      key = "q13_blank")
             q13_col1, q13_col2 = st.columns(2)
 
             with q13_col1:
@@ -686,6 +731,9 @@ if uploaded_files and grader.strip() and st.session_state["user_pin"].strip() ==
                              key = "q13_unt")
 
             st.markdown("**Question 14**")
+            st.button("Blank",
+                      on_click=set_q14_blank,
+                      key = "q14_blank")
             q14_col1, q14_col2, q14_col3 = st.columns(3)
 
             with q14_col1:
